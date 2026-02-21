@@ -26,10 +26,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow: hidden; }
   .app { display: flex; flex-direction: column; height: 100%; }
-  .header {
-    background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    padding: calc(var(--safe-top) + 14px) 20px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 10;
-  }
+  .header { background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: calc(var(--safe-top) + 14px) 20px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 10; }
   .header-row { display: flex; align-items: center; justify-content: space-between; }
   .app-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--orange), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .header-date { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 2px; }
@@ -37,10 +34,7 @@
   .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
   .sync-dot.syncing { background: var(--yellow); animation: pulse 1s infinite; }
   .sync-dot.error { background: var(--pink); }
-  .tabbar {
-    display: flex; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border); padding: 8px 0 calc(var(--safe-bottom) + 8px); flex-shrink: 0;
-  }
+  .tabbar { display: flex; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 8px 0 calc(var(--safe-bottom) + 8px); flex-shrink: 0; }
   .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; cursor: pointer; transition: all 0.2s; font-size: 10px; color: var(--muted); -webkit-user-select: none; }
   .tab-icon { font-size: 20px; transition: transform 0.2s; }
   .tab.active { color: var(--orange); }
@@ -128,7 +122,7 @@
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-logo">BuildLog</div>
   <div class="spinner"></div>
-  <div class="loading-text" id="loadingText">Loading your data...</div>
+  <div class="loading-text">Loading your data...</div>
 </div>
 
 <div class="app">
@@ -250,110 +244,112 @@
 </div>
 
 <script>
+// ── HARDCODED — same bin for ALL browsers/devices ────
 const API_KEY = '$2a$10$HOl57jGAkW21aIs9hkG7F.yuUJ2VRYIGl07t7BUG2UOX8hcfAkKYm';
-let BIN_ID = localStorage.getItem('bl_bin_id') || null;
+const BIN_ID  = '6999efd0d0ea881f40ccf6c9';
+
 let features = [], feedbacks = [], notes = [];
 let saveTimer = null;
 
 // ── JSONBin ───────────────────────────────────────────
-async function createBin(data) {
-  const r = await fetch('https://api.jsonbin.io/v3/b', {
-    method:'POST',
-    headers:{'Content-Type':'application/json','X-Master-Key':API_KEY,'X-Bin-Name':'buildlog-data','X-Bin-Private':'false'},
-    body:JSON.stringify(data)
-  });
-  const j = await r.json();
-  return j.metadata.id;
-}
 async function readBin() {
-  const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{'X-Master-Key':API_KEY}});
+  const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+    headers: { 'X-Master-Key': API_KEY }
+  });
   const j = await r.json();
   return j.record;
 }
 async function updateBin(data) {
-  await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(data)});
+  await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+    body: JSON.stringify(data)
+  });
 }
 
 // ── Sync ─────────────────────────────────────────────
 function setSyncStatus(s) {
-  const dot=document.getElementById('syncDot'), txt=document.getElementById('syncText');
-  dot.className='sync-dot'+(s==='syncing'?' syncing':s==='error'?' error':'');
-  txt.textContent=s==='syncing'?'Saving...':s==='error'?'Offline':'Synced';
+  const dot = document.getElementById('syncDot'), txt = document.getElementById('syncText');
+  dot.className = 'sync-dot' + (s==='syncing'?' syncing':s==='error'?' error':'');
+  txt.textContent = s==='syncing' ? 'Saving...' : s==='error' ? 'Offline' : 'Synced';
 }
-function scheduleSave() { if(saveTimer)clearTimeout(saveTimer); saveTimer=setTimeout(pushData,1000); }
+
+function scheduleSave() {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(pushData, 1000);
+}
+
 async function pushData() {
   setSyncStatus('syncing');
-  const data={features,feedbacks,notes};
+  const data = { features, feedbacks, notes };
   try {
-    if(!BIN_ID){BIN_ID=await createBin(data);localStorage.setItem('bl_bin_id',BIN_ID);}
-    else{await updateBin(data);}
+    await updateBin(data);
     setSyncStatus('synced');
-    localStorage.setItem('bl_cache',JSON.stringify(data));
+    localStorage.setItem('bl_cache', JSON.stringify(data));
   } catch(e) {
     setSyncStatus('error');
-    localStorage.setItem('bl_cache',JSON.stringify(data));
-    showToast('⚠️ Saved locally — check connection');
+    localStorage.setItem('bl_cache', JSON.stringify(data));
+    showToast('⚠️ Saved locally — will sync when online');
   }
 }
+
 async function loadData() {
   try {
-    if(BIN_ID){
-      const data=await readBin();
-      features=data.features||[]; feedbacks=data.feedbacks||[]; notes=data.notes||[];
-      setSyncStatus('synced');
-    } else {
-      const c=localStorage.getItem('bl_cache');
-      if(c){const d=JSON.parse(c);features=d.features||[];feedbacks=d.feedbacks||[];notes=d.notes||[];}
-      setSyncStatus('synced');
-    }
+    const data = await readBin();
+    features  = data.features  || [];
+    feedbacks = data.feedbacks || [];
+    notes     = data.notes     || [];
+    localStorage.setItem('bl_cache', JSON.stringify(data));
+    setSyncStatus('synced');
   } catch(e) {
-    const c=localStorage.getItem('bl_cache');
-    if(c){const d=JSON.parse(c);features=d.features||[];feedbacks=d.feedbacks||[];notes=d.notes||[];}
+    // fallback to local cache if offline
+    const c = localStorage.getItem('bl_cache');
+    if (c) { const d=JSON.parse(c); features=d.features||[]; feedbacks=d.feedbacks||[]; notes=d.notes||[]; }
     setSyncStatus('error');
-    showToast('⚠️ Using local backup');
+    showToast('⚠️ Offline — showing cached data');
   }
   document.getElementById('loadingOverlay').classList.add('hidden');
   renderAll();
 }
 
 // ── Toast ─────────────────────────────────────────────
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 
 // ── Nav ───────────────────────────────────────────────
-let currentTab='dash';
-function gotoTab(tab,el){currentTab=tab;document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('view-'+tab).classList.add('active');el.classList.add('active');if(tab==='dash')renderDash();if(tab==='features')renderFeatures();if(tab==='feedback')renderFeedback();if(tab==='notes')renderNotes();}
-function setSeg(c,b,v){document.querySelectorAll('#'+c+' .seg-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');b.dataset.val=v;}
-function getSegVal(c){const a=document.querySelector('#'+c+' .seg-btn.active');return a?(a.dataset.val||''):''; }
-function timeAgo(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
+let currentTab = 'dash';
+function gotoTab(tab, el) { currentTab=tab; document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('view-'+tab).classList.add('active'); el.classList.add('active'); if(tab==='dash')renderDash(); if(tab==='features')renderFeatures(); if(tab==='feedback')renderFeedback(); if(tab==='notes')renderNotes(); }
+function setSeg(c,b,v) { document.querySelectorAll('#'+c+' .seg-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); b.dataset.val=v; }
+function getSegVal(c) { const a=document.querySelector('#'+c+' .seg-btn.active'); return a?(a.dataset.val||''):''; }
+function timeAgo(ts) { const d=Date.now()-ts,m=Math.floor(d/60000); if(m<1)return'just now'; if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
 
 // ── Sheet ─────────────────────────────────────────────
-function openAdd(){const fm={dash:'feature',features:'feature',feedback:'feedback',notes:'note'};showForm(fm[currentTab]||'feature');document.getElementById('addSheet').classList.add('open');resetForms();}
-function showForm(f){['feature','feedback','note'].forEach(x=>document.getElementById('form-'+x).style.display=x===f?'block':'none');document.getElementById('sheetTitle').textContent={feature:'Add Feature',feedback:'Log Feedback',note:'Add Note'}[f];}
-function closeSheet(){document.getElementById('addSheet').classList.remove('open');}
-document.getElementById('addSheet').addEventListener('click',e=>{if(e.target===document.getElementById('addSheet'))closeSheet();});
-function resetForms(){['f-name','f-desc','fb-title','fb-details','fb-source','n-text','n-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.querySelectorAll('#f-status-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===0));document.querySelectorAll('#f-priority-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===1));document.querySelectorAll('#fb-type-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===0));}
+function openAdd() { const fm={dash:'feature',features:'feature',feedback:'feedback',notes:'note'}; showForm(fm[currentTab]||'feature'); document.getElementById('addSheet').classList.add('open'); resetForms(); }
+function showForm(f) { ['feature','feedback','note'].forEach(x=>document.getElementById('form-'+x).style.display=x===f?'block':'none'); document.getElementById('sheetTitle').textContent={feature:'Add Feature',feedback:'Log Feedback',note:'Add Note'}[f]; }
+function closeSheet() { document.getElementById('addSheet').classList.remove('open'); }
+document.getElementById('addSheet').addEventListener('click', e=>{ if(e.target===document.getElementById('addSheet'))closeSheet(); });
+function resetForms() { ['f-name','f-desc','fb-title','fb-details','fb-source','n-text','n-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';}); document.querySelectorAll('#f-status-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===0)); document.querySelectorAll('#f-priority-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===1)); document.querySelectorAll('#fb-type-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===0)); }
 
 // ── Save ──────────────────────────────────────────────
-function saveFeature(){const n=document.getElementById('f-name').value.trim();if(!n){document.getElementById('f-name').focus();return;}features.unshift({id:Date.now(),name:n,desc:document.getElementById('f-desc').value.trim(),status:getSegVal('f-status-ctrl')||'todo',priority:getSegVal('f-priority-ctrl')||'mid',ts:Date.now(),done:false});closeSheet();renderAll();scheduleSave();showToast('✅ Feature saved!');}
-function saveFeedback(){const t=document.getElementById('fb-title').value.trim();if(!t){document.getElementById('fb-title').focus();return;}feedbacks.unshift({id:Date.now(),type:getSegVal('fb-type-ctrl')||'bug',title:t,details:document.getElementById('fb-details').value.trim(),source:document.getElementById('fb-source').value.trim(),ts:Date.now(),resolved:false});closeSheet();renderAll();scheduleSave();showToast('✅ Feedback saved!');}
-function saveNote(){const t=document.getElementById('n-text').value.trim();if(!t){document.getElementById('n-text').focus();return;}notes.unshift({id:Date.now(),text:t,tag:document.getElementById('n-tag').value.trim(),ts:Date.now(),done:false});closeSheet();renderAll();scheduleSave();showToast('✅ Note saved!');}
+function saveFeature() { const n=document.getElementById('f-name').value.trim(); if(!n){document.getElementById('f-name').focus();return;} features.unshift({id:Date.now(),name:n,desc:document.getElementById('f-desc').value.trim(),status:getSegVal('f-status-ctrl')||'todo',priority:getSegVal('f-priority-ctrl')||'mid',ts:Date.now(),done:false}); closeSheet();renderAll();scheduleSave();showToast('✅ Feature saved!'); }
+function saveFeedback() { const t=document.getElementById('fb-title').value.trim(); if(!t){document.getElementById('fb-title').focus();return;} feedbacks.unshift({id:Date.now(),type:getSegVal('fb-type-ctrl')||'bug',title:t,details:document.getElementById('fb-details').value.trim(),source:document.getElementById('fb-source').value.trim(),ts:Date.now(),resolved:false}); closeSheet();renderAll();scheduleSave();showToast('✅ Feedback saved!'); }
+function saveNote() { const t=document.getElementById('n-text').value.trim(); if(!t){document.getElementById('n-text').focus();return;} notes.unshift({id:Date.now(),text:t,tag:document.getElementById('n-tag').value.trim(),ts:Date.now(),done:false}); closeSheet();renderAll();scheduleSave();showToast('✅ Note saved!'); }
 
 // ── Actions ───────────────────────────────────────────
-function delFeature(id){features=features.filter(x=>x.id!==id);renderAll();scheduleSave();showToast('🗑 Deleted');}
-function delFeedback(id){feedbacks=feedbacks.filter(x=>x.id!==id);renderAll();scheduleSave();showToast('🗑 Deleted');}
-function delNote(id){notes=notes.filter(x=>x.id!==id);renderAll();scheduleSave();showToast('🗑 Deleted');}
-function toggleFeatureDone(id){const f=features.find(x=>x.id===id);if(!f)return;f.done=!f.done;f.status=f.done?'done':'todo';renderAll();scheduleSave();}
-function toggleNoteDone(id){const n=notes.find(x=>x.id===id);if(!n)return;n.done=!n.done;renderAll();scheduleSave();}
-function toggleFbResolved(id){const f=feedbacks.find(x=>x.id===id);if(!f)return;f.resolved=!f.resolved;renderAll();scheduleSave();}
-function cycleStatus(id){const f=features.find(x=>x.id===id);if(!f)return;const o=['todo','doing','done','blocked'];f.status=o[(o.indexOf(f.status)+1)%o.length];f.done=f.status==='done';renderAll();scheduleSave();}
+function delFeature(id) { features=features.filter(x=>x.id!==id); renderAll();scheduleSave();showToast('🗑 Deleted'); }
+function delFeedback(id) { feedbacks=feedbacks.filter(x=>x.id!==id); renderAll();scheduleSave();showToast('🗑 Deleted'); }
+function delNote(id) { notes=notes.filter(x=>x.id!==id); renderAll();scheduleSave();showToast('🗑 Deleted'); }
+function toggleFeatureDone(id) { const f=features.find(x=>x.id===id); if(!f)return; f.done=!f.done; f.status=f.done?'done':'todo'; renderAll();scheduleSave(); }
+function toggleNoteDone(id) { const n=notes.find(x=>x.id===id); if(!n)return; n.done=!n.done; renderAll();scheduleSave(); }
+function toggleFbResolved(id) { const f=feedbacks.find(x=>x.id===id); if(!f)return; f.resolved=!f.resolved; renderAll();scheduleSave(); }
+function cycleStatus(id) { const f=features.find(x=>x.id===id); if(!f)return; const o=['todo','doing','done','blocked']; f.status=o[(o.indexOf(f.status)+1)%o.length]; f.done=f.status==='done'; renderAll();scheduleSave(); }
 
 // ── Render ────────────────────────────────────────────
-function badgeHtml(s){const l={todo:'Todo',doing:'In Progress',done:'Done',blocked:'Blocked'};return`<span class="badge badge-${s}">${l[s]||s}</span>`;}
-function typeEmoji(t){return{bug:'🐛',idea:'💡',ux:'✨',other:'📋'}[t]||'📋';}
-function typeColor(t){return{bug:'var(--pink)',idea:'var(--yellow)',ux:'var(--blue)',other:'var(--muted2)'}[t]||'var(--muted2)';}
-function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function badgeHtml(s) { const l={todo:'Todo',doing:'In Progress',done:'Done',blocked:'Blocked'}; return`<span class="badge badge-${s}">${l[s]||s}</span>`; }
+function typeEmoji(t) { return{bug:'🐛',idea:'💡',ux:'✨',other:'📋'}[t]||'📋'; }
+function typeColor(t) { return{bug:'var(--pink)',idea:'var(--yellow)',ux:'var(--blue)',other:'var(--muted2)'}[t]||'var(--muted2)'; }
+function esc(s) { if(!s)return''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function renderFeatures(q){
+function renderFeatures(q) {
   const list=document.getElementById('features-list');
   let items=[...features];
   if(q){const lq=q.toLowerCase();items=items.filter(f=>(f.name+f.desc).toLowerCase().includes(lq));}
@@ -362,21 +358,21 @@ function renderFeatures(q){
   list.innerHTML=items.map(f=>`<div class="card"><div class="card-accent" style="background:${f.priority==='high'?'var(--pink)':f.priority==='mid'?'var(--yellow)':'var(--muted)'}"></div><div style="padding-left:10px"><div style="display:flex;align-items:flex-start;gap:8px"><button class="done-check ${f.done?'checked':''}" onclick="toggleFeatureDone(${f.id})"></button><div style="flex:1"><div class="card-title ${f.done?'crossed':''}">${esc(f.name)}</div>${f.desc?`<div class="card-meta">${esc(f.desc)}</div>`:''}</div></div><div class="card-footer"><div style="display:flex;align-items:center;gap:8px"><button onclick="cycleStatus(${f.id})" style="background:none;border:none;padding:0;cursor:pointer;">${badgeHtml(f.status)}</button><span style="font-size:11px;color:var(--muted)">${timeAgo(f.ts)}</span></div><button class="icon-btn del" onclick="delFeature(${f.id})">✕</button></div></div></div>`).join('');
 }
 
-function renderFeedback(){
+function renderFeedback() {
   const list=document.getElementById('feedback-list');
   document.getElementById('fb-count').textContent=feedbacks.length;
   if(!feedbacks.length){list.innerHTML=`<div class="empty"><div class="empty-icon">💬</div><div class="empty-text">No feedback yet.<br>Tap + to log some.</div></div>`;return;}
   list.innerHTML=feedbacks.map(f=>`<div class="card"><div class="card-accent" style="background:${typeColor(f.type)}"></div><div style="padding-left:10px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:16px">${typeEmoji(f.type)}</span><span class="fb-type" style="color:${typeColor(f.type)}">${f.type}</span>${f.resolved?'<span class="badge badge-done" style="font-size:10px">Resolved</span>':''}</div><div class="card-title ${f.resolved?'crossed':''}">${esc(f.title)}</div>${f.details?`<div class="card-body">${esc(f.details)}</div>`:''}${f.source?`<div class="card-meta" style="margin-top:6px">📍 ${esc(f.source)}</div>`:''}<div class="card-footer"><span style="font-size:11px;color:var(--muted)">${timeAgo(f.ts)}</span><div class="card-actions"><button class="icon-btn" onclick="toggleFbResolved(${f.id})">${f.resolved?'↺':'✓'}</button><button class="icon-btn del" onclick="delFeedback(${f.id})">✕</button></div></div></div></div>`).join('');
 }
 
-function renderNotes(){
+function renderNotes() {
   const list=document.getElementById('notes-list');
   document.getElementById('notes-count').textContent=notes.length;
   if(!notes.length){list.innerHTML=`<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">No notes yet.<br>Tap + to jot something down.</div></div>`;return;}
   list.innerHTML=notes.map(n=>`<div class="card"><div class="card-accent" style="background:${n.done?'var(--muted)':'linear-gradient(180deg,var(--orange),var(--yellow))'}"></div><div style="padding-left:10px"><div style="display:flex;align-items:flex-start;gap:10px"><button class="done-check ${n.done?'checked':''}" onclick="toggleNoteDone(${n.id})"></button><div style="flex:1"><div class="note-content ${n.done?'crossed':''}">${esc(n.text)}</div><div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between"><div>${n.tag?`<span class="note-tag">${esc(n.tag)}</span>`:''}<span style="font-size:11px;color:var(--muted)">${timeAgo(n.ts)}</span></div><button class="icon-btn del" onclick="delNote(${n.id})">✕</button></div></div></div></div></div>`).join('');
 }
 
-function renderDash(){
+function renderDash() {
   const done=features.filter(f=>f.status==='done').length, doing=features.filter(f=>f.status==='doing').length;
   const pct=features.length?Math.round(done/features.length*100):0;
   document.getElementById('d-features').textContent=features.length;
@@ -392,10 +388,10 @@ function renderDash(){
   el.innerHTML=all.map(item=>`<div class="card" style="padding:12px 14px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">${item.icon}</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">${esc(item.name||item.title||item.text)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${item.kind} · ${timeAgo(item.ts)}</div></div>${item.kind==='feature'?badgeHtml(item.status):''}</div></div>`).join('');
 }
 
-function renderAll(){renderDash();renderFeatures();renderFeedback();renderNotes();}
+function renderAll() { renderDash();renderFeatures();renderFeedback();renderNotes(); }
 
 // ── Init ──────────────────────────────────────────────
-document.getElementById('headerDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
 loadData();
 </script>
 </body>
