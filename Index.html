@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BuildLog">
+<meta name="theme-color" content="#0a0a0f">
+<title>BuildLog</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --card: #13131a;
+    --card2: #1a1a24;
+    --border: #252535;
+    --border2: #2e2e42;
+    --text: #eeeef5;
+    --muted: #5a5a78;
+    --muted2: #7a7a96;
+    --orange: #ff7c3a;
+    --orange-dim: rgba(255,124,58,0.12);
+    --blue: #4d9fff;
+    --blue-dim: rgba(77,159,255,0.12);
+    --green: #3dffa0;
+    --green-dim: rgba(61,255,160,0.12);
+    --pink: #ff4d8f;
+    --pink-dim: rgba(255,77,143,0.12);
+    --yellow: #ffe14d;
+    --yellow-dim: rgba(255,225,77,0.1);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow: hidden; }
+
+/* App shell */
+.app { display: flex; flex-direction: column; height: 100%; }
+
+/* Header */
+.header {
+background: rgba(10,10,15,0.95);
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+padding: calc(var(–safe-top) + 14px) 20px 14px;
+border-bottom: 1px solid var(–border);
+flex-shrink: 0;
+position: relative;
+z-index: 10;
+}
+.header-row { display: flex; align-items: center; justify-content: space-between; }
+.app-name {
+font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+background: linear-gradient(135deg, var(–orange), var(–pink));
+-webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header-date { font-family: ‘JetBrains Mono’, monospace; font-size: 11px; color: var(–muted); margin-top: 2px; }
+
+/* Tab bar */
+.tabbar {
+display: flex;
+background: rgba(10,10,15,0.98);
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+border-top: 1px solid var(–border);
+padding: 8px 0 calc(var(–safe-bottom) + 8px);
+flex-shrink: 0;
+}
+.tab {
+flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+padding: 6px 0; cursor: pointer; transition: all 0.2s;
+font-size: 10px; color: var(–muted); letter-spacing: 0.03em;
+-webkit-user-select: none;
+}
+.tab-icon { font-size: 20px; transition: transform 0.2s; }
+.tab.active { color: var(–orange); }
+.tab.active .tab-icon { transform: scale(1.15); }
+
+/* Scroll content */
+.view { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; display: none; }
+.view.active { display: block; }
+.view-pad { padding: 16px 16px calc(20px); }
+
+/* Section title */
+.section-title {
+font-size: 13px; font-weight: 600; text-transform: uppercase;
+letter-spacing: 0.12em; color: var(–muted2); margin-bottom: 10px;
+display: flex; align-items: center; justify-content: space-between;
+}
+.count-pill {
+background: var(–card2); border: 1px solid var(–border);
+border-radius: 20px; padding: 2px 10px; font-size: 11px;
+color: var(–muted); font-family: ‘JetBrains Mono’, monospace;
+text-transform: none; letter-spacing: 0;
+}
+
+/* Cards */
+.card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 14px 16px;
+margin-bottom: 10px;
+position: relative;
+overflow: hidden;
+animation: fadeUp 0.3s ease both;
+}
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.card-accent {
+position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+border-radius: 16px 0 0 16px;
+}
+.card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.card-title { font-size: 15px; font-weight: 600; line-height: 1.3; flex: 1; }
+.card-meta { font-size: 12px; color: var(–muted2); line-height: 1.5; }
+.card-body { font-size: 13px; color: var(–muted2); line-height: 1.6; margin-top: 6px; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.card-actions { display: flex; gap: 6px; }
+.icon-btn {
+width: 32px; height: 32px; border-radius: 8px;
+border: 1px solid var(–border2); background: var(–card2);
+color: var(–muted2); font-size: 14px; cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+transition: all 0.15s; -webkit-user-select: none;
+}
+.icon-btn:active { transform: scale(0.9); }
+.icon-btn.del:active { background: var(–pink-dim); border-color: var(–pink); color: var(–pink); }
+
+/* Status badges */
+.badge {
+display: inline-flex; align-items: center; gap: 5px;
+padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+letter-spacing: 0.04em;
+}
+.badge::before { content: ‘’; width: 6px; height: 6px; border-radius: 50%; }
+.badge-todo { background: var(–card2); color: var(–muted2); border: 1px solid var(–border2); }
+.badge-todo::before { background: var(–muted); }
+.badge-doing { background: var(–blue-dim); color: var(–blue); border: 1px solid rgba(77,159,255,0.2); }
+.badge-doing::before { background: var(–blue); box-shadow: 0 0 6px var(–blue); animation: pulse 1.5s infinite; }
+.badge-done { background: var(–green-dim); color: var(–green); border: 1px solid rgba(61,255,160,0.2); }
+.badge-done::before { background: var(–green); }
+.badge-blocked { background: var(–pink-dim); color: var(–pink); border: 1px solid rgba(255,77,143,0.2); }
+.badge-blocked::before { background: var(–pink); }
+@keyframes pulse {
+0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+}
+
+/* Priority dot */
+.priority { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.p-high { background: var(–pink); box-shadow: 0 0 8px var(–pink); }
+.p-mid { background: var(–yellow); }
+.p-low { background: var(–muted); }
+
+/* Add button */
+.fab {
+position: fixed; bottom: calc(var(–safe-bottom) + 78px); right: 20px;
+width: 52px; height: 52px; border-radius: 16px;
+background: linear-gradient(135deg, var(–orange), var(–pink));
+border: none; color: white; font-size: 24px; cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+box-shadow: 0 4px 20px rgba(255,124,58,0.4);
+transition: all 0.2s; z-index: 50;
+-webkit-user-select: none;
+}
+.fab:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(255,124,58,0.3); }
+
+/* Progress bar */
+.progress-wrap { margin: 14px 0 4px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: var(–muted2); }
+.progress-track { height: 6px; background: var(–card2); border-radius: 10px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; background: linear-gradient(90deg, var(–orange), var(–pink)); }
+
+/* Dashboard stats */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat-card {
+background: var(–card); border: 1px solid var(–border);
+border-radius: 16px; padding: 14px 16px;
+}
+.stat-num { font-size: 30px; font-weight: 800; line-height: 1; }
+.stat-lbl { font-size: 11px; color: var(–muted2); margin-top: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* Sheet modal */
+.sheet-overlay {
+display: none; position: fixed; inset: 0;
+background: rgba(0,0,0,0.6); z-index: 200;
+backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+align-items: flex-end; justify-content: center;
+}
+.sheet-overlay.open { display: flex; }
+.sheet {
+background: var(–card);
+border: 1px solid var(–border2);
+border-radius: 24px 24px 0 0;
+width: 100%; max-height: 92vh;
+overflow-y: auto; -webkit-overflow-scrolling: touch;
+padding: 8px 20px calc(var(–safe-bottom) + 20px);
+animation: sheetUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes sheetUp {
+from { transform: translateY(100%); }
+to { transform: translateY(0); }
+}
+.sheet-handle {
+width: 40px; height: 4px; background: var(–border2);
+border-radius: 4px; margin: 10px auto 16px;
+}
+.sheet-title { font-size: 18px; font-weight: 700; margin-bottom: 18px; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; color: var(–muted2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; display: block; }
+.form-input, .form-textarea, .form-select {
+width: 100%; background: var(–card2); border: 1px solid var(–border2);
+border-radius: 12px; padding: 12px 14px;
+color: var(–text); font-family: ‘Outfit’, sans-serif; font-size: 15px;
+outline: none; transition: border-color 0.15s; appearance: none;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(–orange); }
+.form-input::placeholder, .form-textarea::placeholder { color: var(–muted); }
+.form-textarea { resize: none; min-height: 90px; line-height: 1.5; }
+.form-select option { background: var(–card2); }
+.seg-ctrl { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg-btn {
+flex: 1; min-width: 60px; padding: 8px 10px; border-radius: 10px;
+border: 1px solid var(–border2); background: var(–card2);
+color: var(–muted2); font-family: ‘Outfit’, sans-serif; font-size: 13px;
+cursor: pointer; transition: all 0.15s; text-align: center;
+-webkit-user-select: none;
+}
+.seg-btn.active { border-color: var(–orange); background: var(–orange-dim); color: var(–orange); font-weight: 600; }
+.btn-primary {
+width: 100%; padding: 15px; border-radius: 14px;
+background: linear-gradient(135deg, var(–orange), var(–pink));
+border: none; color: white; font-family: ‘Outfit’, sans-serif;
+font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 6px;
+transition: opacity 0.15s;
+}
+.btn-primary:active { opacity: 0.85; }
+
+/* Note card special */
+.note-content {
+font-size: 14px; line-height: 1.65; color: var(–text);
+white-space: pre-wrap; word-break: break-word;
+}
+.note-tag {
+display: inline-block; padding: 2px 8px; background: var(–card2);
+border: 1px solid var(–border2); border-radius: 6px;
+font-size: 11px; color: var(–muted2); margin-right: 4px;
+}
+
+/* Feedback type */
+.fb-type { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* Empty state */
+.empty {
+text-align: center; padding: 48px 20px; color: var(–muted);
+}
+.empty-icon { font-size: 44px; margin-bottom: 12px; opacity: 0.5; }
+.empty-text { font-size: 14px; line-height: 1.7; }
+
+/* Checkbox done */
+.done-check {
+width: 22px; height: 22px; border-radius: 7px; flex-shrink: 0;
+border: 2px solid var(–border2); background: none; cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+transition: all 0.15s; -webkit-user-select: none;
+}
+.done-check.checked { background: var(–green); border-color: var(–green); }
+.done-check.checked::after { content: ‘✓’; color: #000; font-size: 13px; font-weight: 700; }
+
+.crossed { text-decoration: line-through; opacity: 0.5; }
+
+/* Search */
+.search-wrap { position: relative; margin-bottom: 12px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(–muted); }
+.search-input {
+width: 100%; background: var(–card); border: 1px solid var(–border2);
+border-radius: 12px; padding: 10px 14px 10px 36px;
+color: var(–text); font-family: ‘Outfit’, sans-serif; font-size: 14px; outline: none;
+}
+.search-input::placeholder { color: var(–muted); }
+.search-input:focus { border-color: var(–orange); }
+</style>
+
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <div class="app-name">BuildLog</div>
+        <div class="header-date" id="headerDate"></div>
+      </div>
+      <div style="font-size:28px">🚀</div>
+    </div>
+  </div>
+
+  <!-- Views -->
+
+  <!-- DASHBOARD -->
+
+  <div class="view active" id="view-dash">
+    <div class="view-pad">
+
+```
+  <div class="section-title" style="margin-bottom:12px">Overview</div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num" id="d-features" style="color:var(--orange)">0</div>
+      <div class="stat-lbl">Features</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="d-doing" style="color:var(--blue)">0</div>
+      <div class="stat-lbl">In Progress</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="d-done" style="color:var(--green)">0</div>
+      <div class="stat-lbl">Done</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="d-feedback" style="color:var(--pink)">0</div>
+      <div class="stat-lbl">Feedbacks</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-accent" style="background:linear-gradient(180deg,var(--orange),var(--pink))"></div>
+    <div class="section-title" style="margin-bottom:4px;padding-left:10px">Build Progress</div>
+    <div class="progress-wrap" style="padding:0 4px">
+      <div class="progress-label">
+        <span id="d-prog-label">0 of 0 features done</span>
+        <span id="d-prog-pct" style="font-weight:700;color:var(--orange)">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="d-prog-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">Recent Activity</div>
+  <div id="d-recent"></div>
+
+</div>
+```
+
+  </div>
+
+  <!-- FEATURES -->
+
+  <div class="view" id="view-features">
+    <div class="view-pad">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" placeholder="Search features..." oninput="renderFeatures(this.value)">
+      </div>
+      <div class="section-title">
+        Features
+        <span class="count-pill" id="feat-count">0</span>
+      </div>
+      <div id="features-list"></div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK -->
+
+  <div class="view" id="view-feedback">
+    <div class="view-pad">
+      <div class="section-title">
+        Feedback Log
+        <span class="count-pill" id="fb-count">0</span>
+      </div>
+      <div id="feedback-list"></div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+
+  <div class="view" id="view-notes">
+    <div class="view-pad">
+      <div class="section-title">
+        Remember / Notes
+        <span class="count-pill" id="notes-count">0</span>
+      </div>
+      <div id="notes-list"></div>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+
+  <div class="tabbar">
+    <div class="tab active" onclick="gotoTab('dash',this)">
+      <span class="tab-icon">📊</span>
+      <span>Overview</span>
+    </div>
+    <div class="tab" onclick="gotoTab('features',this)">
+      <span class="tab-icon">⚡</span>
+      <span>Features</span>
+    </div>
+    <div class="tab" onclick="gotoTab('feedback',this)">
+      <span class="tab-icon">💬</span>
+      <span>Feedback</span>
+    </div>
+    <div class="tab" onclick="gotoTab('notes',this)">
+      <span class="tab-icon">📝</span>
+      <span>Notes</span>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+
+<button class="fab" id="fab" onclick="openAdd()">＋</button>
+
+<!-- ADD SHEET -->
+
+<div class="sheet-overlay" id="addSheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="sheetTitle">Add Feature</div>
+
+```
+<!-- FEATURE form -->
+<div id="form-feature">
+  <div class="form-group">
+    <label class="form-label">Feature Name *</label>
+    <input class="form-input" id="f-name" placeholder="e.g. User login screen">
+  </div>
+  <div class="form-group">
+    <label class="form-label">Description</label>
+    <textarea class="form-textarea" id="f-desc" placeholder="What needs to be built..."></textarea>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Status</label>
+    <div class="seg-ctrl" id="f-status-ctrl">
+      <button class="seg-btn active" onclick="setSeg('f-status-ctrl',this,'todo')">Todo</button>
+      <button class="seg-btn" onclick="setSeg('f-status-ctrl',this,'doing')">In Progress</button>
+      <button class="seg-btn" onclick="setSeg('f-status-ctrl',this,'done')">Done</button>
+      <button class="seg-btn" onclick="setSeg('f-status-ctrl',this,'blocked')">Blocked</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Priority</label>
+    <div class="seg-ctrl" id="f-priority-ctrl">
+      <button class="seg-btn" onclick="setSeg('f-priority-ctrl',this,'high')">🔴 High</button>
+      <button class="seg-btn active" onclick="setSeg('f-priority-ctrl',this,'mid')">🟡 Mid</button>
+      <button class="seg-btn" onclick="setSeg('f-priority-ctrl',this,'low')">⚪ Low</button>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="saveFeature()">Save Feature</button>
+</div>
+
+<!-- FEEDBACK form -->
+<div id="form-feedback" style="display:none">
+  <div class="form-group">
+    <label class="form-label">Type</label>
+    <div class="seg-ctrl" id="fb-type-ctrl">
+      <button class="seg-btn active" onclick="setSeg('fb-type-ctrl',this,'bug')">🐛 Bug</button>
+      <button class="seg-btn" onclick="setSeg('fb-type-ctrl',this,'idea')">💡 Idea</button>
+      <button class="seg-btn" onclick="setSeg('fb-type-ctrl',this,'ux')">✨ UX</button>
+      <button class="seg-btn" onclick="setSeg('fb-type-ctrl',this,'other')">📋 Other</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Title *</label>
+    <input class="form-input" id="fb-title" placeholder="e.g. Button too small on mobile">
+  </div>
+  <div class="form-group">
+    <label class="form-label">Details</label>
+    <textarea class="form-textarea" id="fb-details" placeholder="More context, steps to reproduce..."></textarea>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Source</label>
+    <input class="form-input" id="fb-source" placeholder="e.g. User test, friend, self">
+  </div>
+  <button class="btn-primary" onclick="saveFeedback()">Save Feedback</button>
+</div>
+
+<!-- NOTE form -->
+<div id="form-note" style="display:none">
+  <div class="form-group">
+    <label class="form-label">Note / Reminder *</label>
+    <textarea class="form-textarea" id="n-text" placeholder="Something important to remember..." style="min-height:120px"></textarea>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Tag (optional)</label>
+    <input class="form-input" id="n-tag" placeholder="e.g. design, api, launch">
+  </div>
+  <button class="btn-primary" onclick="saveNote()">Save Note</button>
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+// ── Data ────────────────────────────────────────────
+let features  = JSON.parse(localStorage.getItem('bl_features')  || '[]');
+let feedbacks = JSON.parse(localStorage.getItem('bl_feedbacks') || '[]');
+let notes     = JSON.parse(localStorage.getItem('bl_notes')     || '[]');
+
+function save() {
+  localStorage.setItem('bl_features',  JSON.stringify(features));
+  localStorage.setItem('bl_feedbacks', JSON.stringify(feedbacks));
+  localStorage.setItem('bl_notes',     JSON.stringify(notes));
+}
+
+// ── Helpers ──────────────────────────────────────────
+let currentTab = 'dash';
+
+function gotoTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-'+tab).classList.add('active');
+  el.classList.add('active');
+  if (tab === 'dash') renderDash();
+  if (tab === 'features') renderFeatures();
+  if (tab === 'feedback') renderFeedback();
+  if (tab === 'notes') renderNotes();
+}
+
+function setSeg(ctrlId, btn, val) {
+  document.querySelectorAll('#'+ctrlId+' .seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  btn.dataset.val = val;
+}
+function getSegVal(ctrlId) {
+  const active = document.querySelector('#'+ctrlId+' .seg-btn.active');
+  return active ? (active.dataset.val || active.textContent.trim().toLowerCase().replace(/[^a-z]/g,'')) : '';
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m+'m ago';
+  const h = Math.floor(m/60);
+  if (h < 24) return h+'h ago';
+  const d = Math.floor(h/24);
+  return d+'d ago';
+}
+
+function fmtDate(ts) {
+  return new Date(ts).toLocaleDateString('en-US', {month:'short', day:'numeric'});
+}
+
+// ── FAB & Sheets ────────────────────────────────────
+function openAdd() {
+  // Show relevant form based on current tab
+  const formMap = { dash:'feature', features:'feature', feedback:'feedback', notes:'note' };
+  const form = formMap[currentTab] || 'feature';
+  showForm(form);
+  document.getElementById('addSheet').classList.add('open');
+  resetForms();
+}
+
+function showForm(f) {
+  ['feature','feedback','note'].forEach(x => {
+    document.getElementById('form-'+x).style.display = x===f ? 'block' : 'none';
+  });
+  document.getElementById('sheetTitle').textContent = {feature:'Add Feature', feedback:'Log Feedback', note:'Add Note'}[f];
+}
+
+function closeSheet() { document.getElementById('addSheet').classList.remove('open'); }
+
+document.getElementById('addSheet').addEventListener('click', e => {
+  if (e.target === document.getElementById('addSheet')) closeSheet();
+});
+
+function resetForms() {
+  ['f-name','f-desc','fb-title','fb-details','fb-source','n-text','n-tag'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  // reset segs
+  document.querySelectorAll('#f-status-ctrl .seg-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.querySelectorAll('#f-priority-ctrl .seg-btn').forEach((b,i) => b.classList.toggle('active', i===1));
+  document.querySelectorAll('#fb-type-ctrl .seg-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+}
+
+// ── Save handlers ────────────────────────────────────
+function saveFeature() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { document.getElementById('f-name').focus(); return; }
+  features.unshift({
+    id: Date.now(),
+    name,
+    desc: document.getElementById('f-desc').value.trim(),
+    status: getSegVal('f-status-ctrl') || 'todo',
+    priority: getSegVal('f-priority-ctrl') || 'mid',
+    ts: Date.now(),
+    done: false,
+  });
+  save(); closeSheet(); renderAll();
+}
+
+function saveFeedback() {
+  const title = document.getElementById('fb-title').value.trim();
+  if (!title) { document.getElementById('fb-title').focus(); return; }
+  feedbacks.unshift({
+    id: Date.now(),
+    type: getSegVal('fb-type-ctrl') || 'bug',
+    title,
+    details: document.getElementById('fb-details').value.trim(),
+    source: document.getElementById('fb-source').value.trim(),
+    ts: Date.now(),
+    resolved: false,
+  });
+  save(); closeSheet(); renderAll();
+}
+
+function saveNote() {
+  const text = document.getElementById('n-text').value.trim();
+  if (!text) { document.getElementById('n-text').focus(); return; }
+  notes.unshift({
+    id: Date.now(),
+    text,
+    tag: document.getElementById('n-tag').value.trim(),
+    ts: Date.now(),
+    done: false,
+  });
+  save(); closeSheet(); renderAll();
+}
+
+// ── Delete & toggles ─────────────────────────────────
+function delFeature(id) { features = features.filter(x=>x.id!==id); save(); renderAll(); }
+function delFeedback(id) { feedbacks = feedbacks.filter(x=>x.id!==id); save(); renderAll(); }
+function delNote(id) { notes = notes.filter(x=>x.id!==id); save(); renderAll(); }
+
+function toggleFeatureDone(id) {
+  const f = features.find(x=>x.id===id);
+  if (!f) return;
+  f.done = !f.done;
+  f.status = f.done ? 'done' : 'todo';
+  save(); renderAll();
+}
+
+function toggleNoteDone(id) {
+  const n = notes.find(x=>x.id===id);
+  if (!n) return;
+  n.done = !n.done;
+  save(); renderAll();
+}
+
+function toggleFbResolved(id) {
+  const f = feedbacks.find(x=>x.id===id);
+  if (!f) return;
+  f.resolved = !f.resolved;
+  save(); renderAll();
+}
+
+function cycleStatus(id) {
+  const f = features.find(x=>x.id===id);
+  if (!f) return;
+  const order = ['todo','doing','done','blocked'];
+  const i = order.indexOf(f.status);
+  f.status = order[(i+1)%order.length];
+  f.done = f.status === 'done';
+  save(); renderAll();
+}
+
+// ── Render ───────────────────────────────────────────
+function badgeHtml(status) {
+  const labels = { todo:'Todo', doing:'In Progress', done:'Done', blocked:'Blocked' };
+  return `<span class="badge badge-${status}">${labels[status]||status}</span>`;
+}
+function priorityDot(p) {
+  return `<span class="priority p-${p}" title="${p} priority"></span>`;
+}
+function typeEmoji(t) {
+  return {bug:'🐛',idea:'💡',ux:'✨',other:'📋'}[t]||'📋';
+}
+function typeColor(t) {
+  return {bug:'var(--pink)',idea:'var(--yellow)',ux:'var(--blue)',other:'var(--muted2)'}[t]||'var(--muted2)';
+}
+
+function renderFeatures(q) {
+  const list = document.getElementById('features-list');
+  let items = [...features];
+  if (q) { const lq=q.toLowerCase(); items=items.filter(f=>(f.name+f.desc).toLowerCase().includes(lq)); }
+  document.getElementById('feat-count').textContent = items.length;
+
+  if (!items.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">⚡</div><div class="empty-text">No features yet.<br>Tap + to add your first one.</div></div>`;
+    return;
+  }
+  list.innerHTML = items.map(f => `
+    <div class="card" id="fc-${f.id}">
+      <div class="card-accent" style="background:${f.priority==='high'?'var(--pink)':f.priority==='mid'?'var(--yellow)':'var(--muted)'}"></div>
+      <div class="card-header" style="padding-left:10px">
+        <div style="display:flex;align-items:flex-start;gap:8px;flex:1">
+          <button class="done-check ${f.done?'checked':''}" onclick="toggleFeatureDone(${f.id})"></button>
+          <div>
+            <div class="card-title ${f.done?'crossed':''}">${esc(f.name)}</div>
+            ${f.desc ? `<div class="card-meta">${esc(f.desc)}</div>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="card-footer" style="padding-left:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="cycleStatus(${f.id})" style="background:none;border:none;padding:0;cursor:pointer;">${badgeHtml(f.status)}</button>
+          <span style="font-size:11px;color:var(--muted)">${timeAgo(f.ts)}</span>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn del" onclick="delFeature(${f.id})">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderFeedback() {
+  const list = document.getElementById('feedback-list');
+  document.getElementById('fb-count').textContent = feedbacks.length;
+  if (!feedbacks.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">💬</div><div class="empty-text">No feedback logged yet.<br>Tap + to add feedback.</div></div>`;
+    return;
+  }
+  list.innerHTML = feedbacks.map(f => `
+    <div class="card">
+      <div class="card-accent" style="background:${typeColor(f.type)}"></div>
+      <div style="padding-left:10px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <span style="font-size:16px">${typeEmoji(f.type)}</span>
+          <span class="fb-type" style="color:${typeColor(f.type)}">${f.type}</span>
+          ${f.resolved ? '<span class="badge badge-done" style="font-size:10px">Resolved</span>' : ''}
+        </div>
+        <div class="card-title ${f.resolved?'crossed':''}">${esc(f.title)}</div>
+        ${f.details ? `<div class="card-body">${esc(f.details)}</div>` : ''}
+        ${f.source ? `<div class="card-meta" style="margin-top:6px">📍 ${esc(f.source)}</div>` : ''}
+        <div class="card-footer" style="margin-top:10px;padding:0">
+          <span style="font-size:11px;color:var(--muted)">${timeAgo(f.ts)}</span>
+          <div class="card-actions">
+            <button class="icon-btn" onclick="toggleFbResolved(${f.id})" title="Toggle resolved">${f.resolved?'↺':'✓'}</button>
+            <button class="icon-btn del" onclick="delFeedback(${f.id})">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderNotes() {
+  const list = document.getElementById('notes-list');
+  document.getElementById('notes-count').textContent = notes.length;
+  if (!notes.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">No notes yet.<br>Tap + to jot something down.</div></div>`;
+    return;
+  }
+  list.innerHTML = notes.map(n => `
+    <div class="card" style="border-color:${n.done?'var(--border)':'var(--border2)'}">
+      <div class="card-accent" style="background:${n.done?'var(--muted)':'linear-gradient(180deg,var(--orange),var(--yellow))'}"></div>
+      <div style="padding-left:10px">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <button class="done-check ${n.done?'checked':''}" onclick="toggleNoteDone(${n.id})"></button>
+          <div style="flex:1">
+            <div class="note-content ${n.done?'crossed':''}">${esc(n.text)}</div>
+            <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
+              <div>
+                ${n.tag ? `<span class="note-tag">${esc(n.tag)}</span>` : ''}
+                <span style="font-size:11px;color:var(--muted)">${timeAgo(n.ts)}</span>
+              </div>
+              <button class="icon-btn del" onclick="delNote(${n.id})">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDash() {
+  const done = features.filter(f=>f.status==='done').length;
+  const doing = features.filter(f=>f.status==='doing').length;
+  const pct = features.length ? Math.round(done/features.length*100) : 0;
+
+  document.getElementById('d-features').textContent = features.length;
+  document.getElementById('d-doing').textContent = doing;
+  document.getElementById('d-done').textContent = done;
+  document.getElementById('d-feedback').textContent = feedbacks.length;
+  document.getElementById('d-prog-label').textContent = `${done} of ${features.length} features done`;
+  document.getElementById('d-prog-pct').textContent = pct+'%';
+  document.getElementById('d-prog-bar').style.width = pct+'%';
+
+  // Recent
+  const all = [
+    ...features.map(x=>({...x, kind:'feature', icon:'⚡'})),
+    ...feedbacks.map(x=>({...x, kind:'feedback', icon:typeEmoji(x.type)})),
+    ...notes.map(x=>({...x, kind:'note', icon:'📝'})),
+  ].sort((a,b)=>b.ts-a.ts).slice(0,5);
+
+  const recentEl = document.getElementById('d-recent');
+  if (!all.length) {
+    recentEl.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><div class="empty-text">Start adding features, feedback,<br>and notes to track your progress.</div></div>`;
+    return;
+  }
+  recentEl.innerHTML = all.map(item => `
+    <div class="card" style="padding:12px 14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">${item.icon}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(item.name||item.title||item.text)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${item.kind} · ${timeAgo(item.ts)}</div>
+        </div>
+        ${item.kind==='feature' ? badgeHtml(item.status) : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAll() {
+  renderDash();
+  renderFeatures();
+  renderFeedback();
+  renderNotes();
+}
+
+function esc(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ─────────────────────────────────────────────
+function init() {
+  const now = new Date();
+  document.getElementById('headerDate').textContent =
+    now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+  // Seed sample data if empty
+  if (!features.length && !feedbacks.length && !notes.length) {
+    features = [
+      { id:1, name:'Onboarding screens', desc:'Welcome flow for new users', status:'done', priority:'high', ts:Date.now()-86400000*3, done:true },
+      { id:2, name:'Push notifications', desc:'Daily reminders', status:'doing', priority:'mid', ts:Date.now()-86400000, done:false },
+      { id:3, name:'Dark mode', desc:'System theme toggle', status:'todo', priority:'low', ts:Date.now()-3600000, done:false },
+    ];
+    feedbacks = [
+      { id:4, type:'bug', title:'Crash on login with Google', details:'Happens when tapping Google sign-in button', source:'Self testing', ts:Date.now()-7200000, resolved:false },
+      { id:5, type:'idea', title:'Add swipe gestures', details:'Would feel more native on iOS', source:'Friend review', ts:Date.now()-86400000*2, resolved:false },
+    ];
+    notes = [
+      { id:6, text:'Check Apple Human Interface Guidelines before submitting to App Store', tag:'launch', ts:Date.now()-1800000, done:false },
+      { id:7, text:'Need to add privacy policy URL before App Store submission', tag:'legal', ts:Date.now()-86400000, done:false },
+    ];
+    save();
+  }
+
+  renderAll();
+}
+
+init();
+</script>
+
+</body>
+</html>
