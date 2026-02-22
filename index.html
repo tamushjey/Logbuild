@@ -11,52 +11,89 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f5f7; --card: #ffffff; --card2: #f0f0f4;
-    --border: #e4e4ea; --border2: #d8d8e2;
-    --text: #1a1a2e; --muted: #9898b0; --muted2: #6e6e88;
-    --orange: #f05a28; --orange-dim: rgba(240,90,40,0.09);
-    --blue: #2d7dd2; --blue-dim: rgba(45,125,210,0.1);
-    --green: #1a9e5c; --green-dim: rgba(26,158,92,0.1);
-    --pink: #d63384; --pink-dim: rgba(214,51,132,0.09);
+    --bg: #f0f0f5;
+    --card: #ffffff;
+    --card2: #f5f5f8;
+    --border: #e8e8ee;
+    --border2: #d8d8e2;
+    --text: #1a1a2e;
+    --muted: #9898b0;
+    --muted2: #6e6e88;
+    --orange: #f05a28;
+    --orange-dim: rgba(240,90,40,0.08);
+    --blue: #2d7dd2;
+    --blue-dim: rgba(45,125,210,0.1);
+    --green: #1a9e5c;
+    --green-dim: rgba(26,158,92,0.1);
+    --pink: #d63384;
+    --pink-dim: rgba(214,51,132,0.09);
     --yellow: #e6a817;
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+    --yellow-dim: rgba(230,168,23,0.1);
+    --purple: #7c3aed;
+    --purple-dim: rgba(124,58,237,0.09);
+    --teal: #0891b2;
+    --shadow: 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow: hidden; }
   .app { display: flex; flex-direction: column; height: 100%; }
-  .header { background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: calc(var(--safe-top) + 14px) 20px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 10; }
+
+  /* ── Header ── */
+  .header { background: rgba(255,255,255,0.94); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: calc(var(--safe-top) + 14px) 20px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 10; }
   .header-row { display: flex; align-items: center; justify-content: space-between; }
   .app-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--orange), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .header-date { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 2px; }
   .sync-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted2); }
   .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
-  .sync-dot.syncing { background: var(--yellow); animation: pulse 1s infinite; }
+  .sync-dot.syncing { background: var(--yellow); animation: blink 1s infinite; }
   .sync-dot.error { background: var(--pink); }
-  .tabbar { display: flex; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 8px 0 calc(var(--safe-bottom) + 8px); flex-shrink: 0; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── Tabbar ── */
+  .tabbar { display: flex; background: rgba(255,255,255,0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 8px 0 calc(var(--safe-bottom) + 8px); flex-shrink: 0; }
   .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; cursor: pointer; transition: all 0.2s; font-size: 10px; color: var(--muted); -webkit-user-select: none; }
   .tab-icon { font-size: 20px; transition: transform 0.2s; }
   .tab.active { color: var(--orange); }
   .tab.active .tab-icon { transform: scale(1.15); }
+
+  /* ── Views ── */
   .view { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; display: none; }
   .view.active { display: block; }
-  .view-pad { padding: 16px 16px 20px; }
-  .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted2); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-  .count-pill { background: var(--card2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 10px; font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; text-transform: none; letter-spacing: 0; }
+  .view-pad { padding: 16px 16px 90px; }
+
+  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted2); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+  .count-pill { background: var(--card2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 9px; font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; text-transform: none; letter-spacing: 0; }
+
+  /* ── Feature cards ── */
+  .feat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .feat-card-accent { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: 14px 0 0 14px; }
+  .feat-card-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .feat-card-desc { font-size: 12px; color: var(--muted2); margin-top: 2px; line-height: 1.4; }
+  .feat-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 6px; flex-wrap: wrap; }
+  .feat-card-actions { display: flex; gap: 5px; }
+
+  /* ── Generic card ── */
   .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); animation: fadeUp 0.3s ease both; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   .card-accent { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: 16px 0 0 16px; }
   .card-title { font-size: 15px; font-weight: 600; line-height: 1.3; color: var(--text); }
   .card-meta { font-size: 12px; color: var(--muted2); line-height: 1.5; margin-top: 3px; }
   .card-body { font-size: 13px; color: var(--muted2); line-height: 1.6; margin-top: 6px; }
-  .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; flex-wrap: wrap; gap: 6px; }
   .card-actions { display: flex; gap: 6px; }
-  .icon-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border2); background: var(--card2); color: var(--muted2); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; -webkit-user-select: none; }
-  .icon-btn:active { transform: scale(0.9); }
+
+  /* ── Icon buttons ── */
+  .icon-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border2); background: var(--card2); color: var(--muted2); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; -webkit-user-select: none; }
+  .icon-btn:active { transform: scale(0.88); }
   .icon-btn.del:active { background: var(--pink-dim); border-color: var(--pink); color: var(--pink); }
-  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-  .badge::before { content:''; width:6px; height:6px; border-radius:50%; }
+  .icon-btn.edit:active { background: var(--blue-dim); border-color: var(--blue); color: var(--blue); }
+
+  /* ── Status badges ── */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge::before { content:''; width:5px; height:5px; border-radius:50%; }
   .badge-todo { background:var(--card2); color:var(--muted2); border:1px solid var(--border2); }
   .badge-todo::before { background:var(--muted); }
   .badge-doing { background:var(--blue-dim); color:var(--blue); border:1px solid rgba(45,125,210,0.2); }
@@ -66,55 +103,168 @@
   .badge-blocked { background:var(--pink-dim); color:var(--pink); border:1px solid rgba(214,51,132,0.2); }
   .badge-blocked::before { background:var(--pink); }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .fab { position: fixed; bottom: calc(var(--safe-bottom) + 78px); right: 20px; width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, var(--orange), var(--pink)); border: none; color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(240,90,40,0.35); transition: all 0.2s; z-index: 50; }
-  .fab:active { transform: scale(0.92); }
-  .progress-wrap { margin: 12px 0 4px; }
-  .progress-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: var(--muted2); }
+
+  /* ── Role tags ── */
+  .role-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-right: 3px; margin-top: 3px; }
+
+  /* ── FOLDER DESIGN ── */
+  .folder-section { margin-bottom: 20px; }
+
+  .folder-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+
+  .folder-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; cursor: pointer; -webkit-user-select: none;
+    transition: background 0.15s;
+  }
+  .folder-top:active { background: var(--card2); }
+
+  .folder-color-stripe {
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .folder-emoji-wrap {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+
+  .folder-info { flex: 1; margin-left: 12px; }
+  .folder-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .folder-subtitle { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+  .folder-right-wrap { display: flex; align-items: center; gap: 8px; }
+  .folder-count-badge {
+    min-width: 24px; height: 24px; border-radius: 12px;
+    background: var(--card2); border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--muted2);
+    padding: 0 7px; font-family: 'JetBrains Mono', monospace;
+  }
+  .folder-chevron { font-size: 16px; color: var(--muted); transition: transform 0.25s; display: flex; align-items: center; }
+  .folder-chevron.open { transform: rotate(90deg); }
+
+  .folder-progress-bar { height: 3px; background: var(--border); margin: 0 16px; border-radius: 4px; overflow: hidden; }
+  .folder-progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+
+  .folder-divider { height: 1px; background: var(--border); margin: 0; }
+
+  .folder-content { padding: 10px 12px 12px; background: var(--card2); display: none; }
+  .folder-content.open { display: block; }
+  .folder-empty-msg { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+
+  .folder-del-btn { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-user-select: none; transition: all 0.15s; }
+  .folder-del-btn:active { background: var(--pink-dim); color: var(--pink); border-color: var(--pink); }
+
+  /* ── FAB ── */
+  .fab { position: fixed; bottom: calc(var(--safe-bottom) + 76px); right: 20px; width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, var(--orange), var(--pink)); border: none; color: white; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(240,90,40,0.38); transition: all 0.2s; z-index: 50; line-height: 1; }
+  .fab:active { transform: scale(0.91); }
+
+  /* ── Progress ── */
+  .progress-wrap { margin: 10px 0 4px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; color: var(--muted2); }
   .progress-track { height: 7px; background: var(--card2); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
   .progress-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; background: linear-gradient(90deg, var(--orange), var(--pink)); }
+
+  /* ── Stats ── */
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
   .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow-sm); }
   .stat-num { font-size: 30px; font-weight: 800; line-height: 1; }
   .stat-lbl { font-size: 11px; color: var(--muted2); margin-top: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* ── Filter bar ── */
+  .filter-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-chip { flex-shrink: 0; padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--border2); background: var(--card); color: var(--muted2); cursor: pointer; -webkit-user-select: none; transition: all 0.15s; }
+  .filter-chip.active { background: var(--orange-dim); border-color: var(--orange); color: var(--orange); }
+
+  /* ── Loading ── */
   .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.96); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; }
   .loading-overlay.hidden { display: none; }
   .spinner { width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--border2); border-top-color: var(--orange); animation: spin 0.8s linear infinite; }
   @keyframes spin { to{transform:rotate(360deg)} }
   .loading-logo { font-size: 24px; font-weight: 800; background: linear-gradient(135deg, var(--orange), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .loading-text { font-size: 13px; color: var(--muted2); }
+
+  /* ── Sheets ── */
   .sheet-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 200; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); align-items: flex-end; }
   .sheet-overlay.open { display: flex; }
-  .sheet { background: var(--card); border: 1px solid var(--border); border-radius: 24px 24px 0 0; width: 100%; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 20px calc(var(--safe-bottom) + 20px); animation: sheetUp 0.3s cubic-bezier(0.32,0.72,0,1); box-shadow: 0 -4px 30px rgba(0,0,0,0.08); }
+  .sheet { background: var(--card); border: 1px solid var(--border); border-radius: 24px 24px 0 0; width: 100%; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 20px calc(var(--safe-bottom) + 20px); animation: sheetUp 0.3s cubic-bezier(0.32,0.72,0,1); box-shadow: 0 -4px 30px rgba(0,0,0,0.1); }
   @keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
   .sheet-handle { width: 40px; height: 4px; background: var(--border2); border-radius: 4px; margin: 10px auto 16px; }
   .sheet-title { font-size: 18px; font-weight: 700; margin-bottom: 18px; color: var(--text); }
+
   .form-group { margin-bottom: 14px; }
   .form-label { font-size: 12px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; display: block; font-weight: 600; }
   .form-input, .form-textarea { width: 100%; background: var(--card2); border: 1px solid var(--border2); border-radius: 12px; padding: 12px 14px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 15px; outline: none; transition: border-color 0.15s; }
   .form-input:focus, .form-textarea:focus { border-color: var(--orange); background: #fff; }
   .form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
-  .form-textarea { resize: none; min-height: 90px; line-height: 1.5; }
+  .form-textarea { resize: none; min-height: 80px; line-height: 1.5; }
+
   .seg-ctrl { display: flex; gap: 6px; flex-wrap: wrap; }
-  .seg-btn { flex: 1; min-width: 60px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border2); background: var(--card2); color: var(--muted2); font-family: 'Outfit', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s; text-align: center; -webkit-user-select: none; }
+  .seg-btn { flex: 1; min-width: 55px; padding: 8px 8px; border-radius: 10px; border: 1px solid var(--border2); background: var(--card2); color: var(--muted2); font-family: 'Outfit', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.15s; text-align: center; -webkit-user-select: none; }
   .seg-btn.active { border-color: var(--orange); background: var(--orange-dim); color: var(--orange); font-weight: 600; }
-  .btn-primary { width: 100%; padding: 15px; border-radius: 14px; background: linear-gradient(135deg, var(--orange), var(--pink)); border: none; color: white; font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 6px; transition: opacity 0.15s; box-shadow: 0 3px 12px rgba(240,90,40,0.25); }
+
+  .btn-primary { width: 100%; padding: 15px; border-radius: 14px; background: linear-gradient(135deg, var(--orange), var(--pink)); border: none; color: white; font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 6px; transition: opacity 0.15s; box-shadow: 0 3px 12px rgba(240,90,40,0.22); }
   .btn-primary:active { opacity: 0.85; }
-  .note-content { font-size: 14px; line-height: 1.65; color: var(--text); white-space: pre-wrap; word-break: break-word; }
-  .note-tag { display: inline-block; padding: 2px 8px; background: var(--card2); border: 1px solid var(--border2); border-radius: 6px; font-size: 11px; color: var(--muted2); margin-right: 4px; }
-  .fb-type { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
-  .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
-  .empty-icon { font-size: 44px; margin-bottom: 12px; opacity: 0.4; }
-  .empty-text { font-size: 14px; line-height: 1.7; }
+
+  /* ── Folder picker ── */
+  .folder-picker { position: relative; }
+  .folder-search-input { width: 100%; background: var(--card2); border: 1px solid var(--border2); border-radius: 12px; padding: 12px 14px 12px 40px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 15px; outline: none; transition: border-color 0.15s; }
+  .folder-search-input:focus { border-color: var(--orange); background: #fff; }
+  .folder-search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--muted); pointer-events: none; }
+  .folder-dropdown { background: var(--card); border: 1px solid var(--border2); border-radius: 14px; margin-top: 6px; overflow: hidden; box-shadow: var(--shadow); display: none; }
+  .folder-dropdown.open { display: block; }
+  .folder-option { display: flex; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; transition: background 0.12s; -webkit-user-select: none; border-bottom: 1px solid var(--border); }
+  .folder-option:last-child { border-bottom: none; }
+  .folder-option:active { background: var(--card2); }
+  .folder-option.selected { background: var(--orange-dim); }
+  .folder-option-icon { font-size: 18px; }
+  .folder-option-name { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
+  .folder-option-count { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .folder-selected-display { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 8px 12px; background: var(--orange-dim); border: 1px solid rgba(240,90,40,0.2); border-radius: 10px; display: none; }
+  .folder-selected-display.show { display: flex; }
+  .folder-selected-text { font-size: 13px; font-weight: 600; color: var(--orange); flex: 1; }
+  .folder-selected-clear { font-size: 14px; color: var(--muted); cursor: pointer; padding: 2px 4px; }
+
+  /* ── Role chips ── */
+  .role-chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+  .role-chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--border2); background: var(--card2); color: var(--muted2); cursor: pointer; -webkit-user-select: none; transition: all 0.15s; }
+  .role-chip.active { border-color: var(--purple); background: var(--purple-dim); color: var(--purple); }
+
+  /* ── Checkbox ── */
   .done-check { width: 22px; height: 22px; border-radius: 7px; flex-shrink: 0; border: 2px solid var(--border2); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; -webkit-user-select: none; }
   .done-check.checked { background: var(--green); border-color: var(--green); }
   .done-check.checked::after { content:'✓'; color:#fff; font-size:13px; font-weight:700; }
   .crossed { text-decoration: line-through; opacity: 0.45; }
-  .search-wrap { position: relative; margin-bottom: 12px; }
+
+  /* ── Note ── */
+  .note-content { font-size: 14px; line-height: 1.65; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+  .note-tag-pill { display: inline-block; padding: 2px 8px; background: var(--card2); border: 1px solid var(--border2); border-radius: 6px; font-size: 11px; color: var(--muted2); margin-right: 4px; }
+  .fb-type-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* ── Search ── */
+  .search-wrap { position: relative; margin-bottom: 10px; }
   .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--muted); }
   .search-input { width: 100%; background: var(--card); border: 1px solid var(--border2); border-radius: 12px; padding: 10px 14px 10px 36px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 14px; outline: none; box-shadow: var(--shadow-sm); }
   .search-input:focus { border-color: var(--orange); }
+
+  /* ── Toast ── */
   .toast { position: fixed; bottom: calc(var(--safe-bottom) + 140px); left: 50%; transform: translateX(-50%); background: #1a1a2e; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 500; z-index: 300; opacity: 0; transition: opacity 0.2s; white-space: nowrap; pointer-events: none; }
   .toast.show { opacity: 1; }
+
+  /* ── Empty ── */
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.4; }
+  .empty-text { font-size: 14px; line-height: 1.7; }
 </style>
 </head>
 <body>
@@ -126,6 +276,7 @@
 </div>
 
 <div class="app">
+  <!-- Header -->
   <div class="header">
     <div class="header-row">
       <div>
@@ -133,18 +284,16 @@
         <div class="header-date" id="headerDate"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
-        <div class="sync-badge">
-          <div class="sync-dot" id="syncDot"></div>
-          <span id="syncText">Synced</span>
-        </div>
+        <div class="sync-badge"><div class="sync-dot" id="syncDot"></div><span id="syncText">Synced</span></div>
         <span style="font-size:24px">🚀</span>
       </div>
     </div>
   </div>
 
+  <!-- DASHBOARD -->
   <div class="view active" id="view-dash">
     <div class="view-pad">
-      <div class="section-title" style="margin-bottom:12px">Overview</div>
+      <div class="section-label" style="margin-bottom:12px">Overview</div>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-num" id="d-features" style="color:var(--orange)">0</div><div class="stat-lbl">Features</div></div>
         <div class="stat-card"><div class="stat-num" id="d-doing" style="color:var(--blue)">0</div><div class="stat-lbl">In Progress</div></div>
@@ -153,35 +302,39 @@
       </div>
       <div class="card" style="margin-bottom:16px">
         <div class="card-accent" style="background:linear-gradient(180deg,var(--orange),var(--pink))"></div>
-        <div class="section-title" style="margin-bottom:4px;padding-left:10px">Build Progress</div>
+        <div class="section-label" style="margin-bottom:4px;padding-left:10px">Build Progress</div>
         <div class="progress-wrap" style="padding:0 4px">
           <div class="progress-label"><span id="d-prog-label">0 of 0 done</span><span id="d-prog-pct" style="font-weight:700;color:var(--orange)">0%</span></div>
           <div class="progress-track"><div class="progress-fill" id="d-prog-bar" style="width:0%"></div></div>
         </div>
       </div>
-      <div class="section-title">Recent Activity</div>
+      <div class="section-label">Recent Activity</div>
       <div id="d-recent"></div>
     </div>
   </div>
 
+  <!-- FEATURES -->
   <div class="view" id="view-features">
     <div class="view-pad">
-      <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" placeholder="Search features..." oninput="renderFeatures(this.value)"></div>
-      <div class="section-title">Features <span class="count-pill" id="feat-count">0</span></div>
+      <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="featSearch" placeholder="Search features..." oninput="renderFeatures()"></div>
+      <div class="filter-bar" id="roleFilterBar"></div>
+      <div class="section-label">Features <span class="count-pill" id="feat-count">0</span></div>
       <div id="features-list"></div>
     </div>
   </div>
 
+  <!-- FEEDBACK -->
   <div class="view" id="view-feedback">
     <div class="view-pad">
-      <div class="section-title">Feedback Log <span class="count-pill" id="fb-count">0</span></div>
+      <div class="section-label">Feedback Log <span class="count-pill" id="fb-count">0</span></div>
       <div id="feedback-list"></div>
     </div>
   </div>
 
+  <!-- NOTES -->
   <div class="view" id="view-notes">
     <div class="view-pad">
-      <div class="section-title">Notes / Reminders <span class="count-pill" id="notes-count">0</span></div>
+      <div class="section-label">Notes / Reminders <span class="count-pill" id="notes-count">0</span></div>
       <div id="notes-list"></div>
     </div>
   </div>
@@ -197,13 +350,53 @@
 <button class="fab" onclick="openAdd()">＋</button>
 <div class="toast" id="toast"></div>
 
+<!-- FAB MENU -->
+<div class="sheet-overlay" id="fabMenu">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Add New</div>
+    <button class="btn-primary" style="margin-bottom:10px" onclick="closeFabMenu();openForm('feature')">⚡ Feature</button>
+    <button class="btn-primary" style="background:linear-gradient(135deg,var(--blue),var(--purple));box-shadow:none;margin-bottom:10px" onclick="closeFabMenu();openForm('folder')">📁 New Folder</button>
+    <button class="btn-primary" style="background:linear-gradient(135deg,var(--pink),var(--yellow));box-shadow:none;margin-bottom:10px" onclick="closeFabMenu();openForm('feedback')">💬 Feedback</button>
+    <button class="btn-primary" style="background:linear-gradient(135deg,var(--green),var(--teal));box-shadow:none" onclick="closeFabMenu();openForm('note')">📝 Note</button>
+  </div>
+</div>
+
+<!-- MAIN SHEET -->
 <div class="sheet-overlay" id="addSheet">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title" id="sheetTitle">Add Feature</div>
+
+    <!-- FEATURE form -->
     <div id="form-feature">
       <div class="form-group"><label class="form-label">Feature Name *</label><input class="form-input" id="f-name" placeholder="e.g. User login screen"></div>
       <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="f-desc" placeholder="What needs to be built..."></textarea></div>
+
+      <!-- Folder picker -->
+      <div class="form-group">
+        <label class="form-label">📁 Folder</label>
+        <div class="folder-picker">
+          <div style="position:relative">
+            <span class="folder-search-icon">📁</span>
+            <input class="folder-search-input" id="folderSearchInput" placeholder="Search or select a folder..." oninput="filterFolderOptions()" onfocus="openFolderDropdown()" autocomplete="off">
+          </div>
+          <div class="folder-dropdown" id="folderDropdown"></div>
+          <div class="folder-selected-display" id="folderSelectedDisplay">
+            <span id="folderSelectedIcon" style="font-size:16px">📁</span>
+            <span class="folder-selected-text" id="folderSelectedText"></span>
+            <span class="folder-selected-clear" onclick="clearFolderSelection()">✕</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Role tags -->
+      <div class="form-group">
+        <label class="form-label">🏷️ Role Tags</label>
+        <div class="role-chips-wrap" id="f-role-chips"></div>
+        <input class="form-input" id="f-custom-role" placeholder="Type a custom role and press comma or enter..." style="margin-top:8px">
+      </div>
+
       <div class="form-group"><label class="form-label">Status</label>
         <div class="seg-ctrl" id="f-status-ctrl">
           <button class="seg-btn active" onclick="setSeg('f-status-ctrl',this,'todo')">Todo</button>
@@ -219,8 +412,48 @@
           <button class="seg-btn" onclick="setSeg('f-priority-ctrl',this,'low')">⚪ Low</button>
         </div>
       </div>
-      <button class="btn-primary" onclick="saveFeature()">Save Feature</button>
+      <button class="btn-primary" id="featureSaveBtn" onclick="saveFeature()">Save Feature</button>
     </div>
+
+    <!-- FOLDER form -->
+    <div id="form-folder" style="display:none">
+      <div class="form-group"><label class="form-label">Folder Name *</label><input class="form-input" id="fold-name" placeholder="e.g. MVP, Backend, v2, Design"></div>
+      <div class="form-group"><label class="form-label">Pick an Emoji Icon</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px" id="emojiPicker">
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">📁</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">🚀</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">⚡</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">🎨</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">💻</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">🔧</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">📱</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">🌟</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">🔥</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">💡</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">🧪</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">🎯</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">🏗️</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">📋</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">🛡️</span>
+          <span style="font-size:24px;cursor:pointer;padding:4px" onclick="selectEmoji(this)">💎</span>
+        </div>
+        <input class="form-input" id="fold-icon" placeholder="Or type any emoji..." maxlength="4" style="margin-top:4px">
+      </div>
+      <div class="form-group"><label class="form-label">Color Theme</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="colorPicker">
+          <div class="color-swatch" style="width:32px;height:32px;border-radius:10px;background:var(--orange);cursor:pointer;border:3px solid transparent" onclick="selectColor(this,'var(--orange)')"></div>
+          <div class="color-swatch" style="width:32px;height:32px;border-radius:10px;background:var(--blue);cursor:pointer;border:3px solid transparent" onclick="selectColor(this,'var(--blue)')"></div>
+          <div class="color-swatch" style="width:32px;height:32px;border-radius:10px;background:var(--green);cursor:pointer;border:3px solid transparent" onclick="selectColor(this,'var(--green)')"></div>
+          <div class="color-swatch" style="width:32px;height:32px;border-radius:10px;background:var(--pink);cursor:pointer;border:3px solid transparent" onclick="selectColor(this,'var(--pink)')"></div>
+          <div class="color-swatch" style="width:32px;height:32px;border-radius:10px;background:var(--purple);cursor:pointer;border:3px solid transparent" onclick="selectColor(this,'var(--purple)')"></div>
+          <div class="color-swatch" style="width:32px;height:32px;border-radius:10px;background:var(--yellow);cursor:pointer;border:3px solid transparent" onclick="selectColor(this,'var(--yellow)')"></div>
+          <div class="color-swatch" style="width:32px;height:32px;border-radius:10px;background:var(--teal);cursor:pointer;border:3px solid transparent" onclick="selectColor(this,'var(--teal)')"></div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="saveFolder()">Create Folder</button>
+    </div>
+
+    <!-- FEEDBACK form -->
     <div id="form-feedback" style="display:none">
       <div class="form-group"><label class="form-label">Type</label>
         <div class="seg-ctrl" id="fb-type-ctrl">
@@ -235,6 +468,8 @@
       <div class="form-group"><label class="form-label">Source</label><input class="form-input" id="fb-source" placeholder="e.g. User test, friend, self"></div>
       <button class="btn-primary" onclick="saveFeedback()">Save Feedback</button>
     </div>
+
+    <!-- NOTE form -->
     <div id="form-note" style="display:none">
       <div class="form-group"><label class="form-label">Note / Reminder *</label><textarea class="form-textarea" id="n-text" placeholder="Something important to remember..." style="min-height:120px"></textarea></div>
       <div class="form-group"><label class="form-label">Tag (optional)</label><input class="form-input" id="n-tag" placeholder="e.g. design, api, launch"></div>
@@ -244,136 +479,338 @@
 </div>
 
 <script>
-// ── HARDCODED — same bin for ALL browsers/devices ────
 const API_KEY = '$2a$10$HOl57jGAkW21aIs9hkG7F.yuUJ2VRYIGl07t7BUG2UOX8hcfAkKYm';
 const BIN_ID  = '6999efd0d0ea881f40ccf6c9';
+const DEFAULT_ROLES = ['🎨 Designer','💻 Dev','📋 PM','📱 iOS','🔧 Backend','🧪 QA'];
+const FOLDER_COLORS = ['var(--orange)','var(--blue)','var(--green)','var(--pink)','var(--purple)','var(--yellow)','var(--teal)'];
 
-let features = [], feedbacks = [], notes = [];
-let saveTimer = null;
+let features=[], feedbacks=[], notes=[], folders=[];
+let saveTimer=null, editingFeatureId=null, activeRoleFilter='All';
+let selectedFolderName=null, selectedFolderEmoji='📁';
+let selectedFolderIcon='📁', selectedFolderColor='var(--orange)';
 
 // ── JSONBin ───────────────────────────────────────────
-async function readBin() {
-  const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-    headers: { 'X-Master-Key': API_KEY }
-  });
-  const j = await r.json();
-  return j.record;
-}
-async function updateBin(data) {
-  await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-    body: JSON.stringify(data)
-  });
-}
+async function readBin(){const r=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{'X-Master-Key':API_KEY}});return(await r.json()).record;}
+async function updateBin(data){await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(data)});}
 
-// ── Sync ─────────────────────────────────────────────
-function setSyncStatus(s) {
-  const dot = document.getElementById('syncDot'), txt = document.getElementById('syncText');
-  dot.className = 'sync-dot' + (s==='syncing'?' syncing':s==='error'?' error':'');
-  txt.textContent = s==='syncing' ? 'Saving...' : s==='error' ? 'Offline' : 'Synced';
+function setSyncStatus(s){const dot=document.getElementById('syncDot'),txt=document.getElementById('syncText');dot.className='sync-dot'+(s==='syncing'?' syncing':s==='error'?' error':'');txt.textContent=s==='syncing'?'Saving...':s==='error'?'Offline':'Synced';}
+function scheduleSave(){if(saveTimer)clearTimeout(saveTimer);saveTimer=setTimeout(pushData,1000);}
+async function pushData(){setSyncStatus('syncing');const data={features,feedbacks,notes,folders};try{await updateBin(data);setSyncStatus('synced');localStorage.setItem('bl_cache',JSON.stringify(data));}catch(e){setSyncStatus('error');localStorage.setItem('bl_cache',JSON.stringify(data));showToast('⚠️ Saved locally');}}
+async function loadData(){
+  try{const d=await readBin();features=d.features||[];feedbacks=d.feedbacks||[];notes=d.notes||[];folders=d.folders||[];localStorage.setItem('bl_cache',JSON.stringify(d));setSyncStatus('synced');}
+  catch(e){const c=localStorage.getItem('bl_cache');if(c){const d=JSON.parse(c);features=d.features||[];feedbacks=d.feedbacks||[];notes=d.notes||[];folders=d.folders||[];}setSyncStatus('error');showToast('⚠️ Offline — cached data');}
+  document.getElementById('loadingOverlay').classList.add('hidden');renderAll();
 }
-
-function scheduleSave() {
-  if (saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout(pushData, 1000);
-}
-
-async function pushData() {
-  setSyncStatus('syncing');
-  const data = { features, feedbacks, notes };
-  try {
-    await updateBin(data);
-    setSyncStatus('synced');
-    localStorage.setItem('bl_cache', JSON.stringify(data));
-  } catch(e) {
-    setSyncStatus('error');
-    localStorage.setItem('bl_cache', JSON.stringify(data));
-    showToast('⚠️ Saved locally — will sync when online');
-  }
-}
-
-async function loadData() {
-  try {
-    const data = await readBin();
-    features  = data.features  || [];
-    feedbacks = data.feedbacks || [];
-    notes     = data.notes     || [];
-    localStorage.setItem('bl_cache', JSON.stringify(data));
-    setSyncStatus('synced');
-  } catch(e) {
-    // fallback to local cache if offline
-    const c = localStorage.getItem('bl_cache');
-    if (c) { const d=JSON.parse(c); features=d.features||[]; feedbacks=d.feedbacks||[]; notes=d.notes||[]; }
-    setSyncStatus('error');
-    showToast('⚠️ Offline — showing cached data');
-  }
-  document.getElementById('loadingOverlay').classList.add('hidden');
-  renderAll();
-}
-
-// ── Toast ─────────────────────────────────────────────
-function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
 // ── Nav ───────────────────────────────────────────────
-let currentTab = 'dash';
-function gotoTab(tab, el) { currentTab=tab; document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('view-'+tab).classList.add('active'); el.classList.add('active'); if(tab==='dash')renderDash(); if(tab==='features')renderFeatures(); if(tab==='feedback')renderFeedback(); if(tab==='notes')renderNotes(); }
-function setSeg(c,b,v) { document.querySelectorAll('#'+c+' .seg-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); b.dataset.val=v; }
-function getSegVal(c) { const a=document.querySelector('#'+c+' .seg-btn.active'); return a?(a.dataset.val||''):''; }
-function timeAgo(ts) { const d=Date.now()-ts,m=Math.floor(d/60000); if(m<1)return'just now'; if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
+let currentTab='dash';
+function gotoTab(tab,el){currentTab=tab;document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('view-'+tab).classList.add('active');el.classList.add('active');renderAll();}
+function setSeg(c,b,v){document.querySelectorAll('#'+c+' .seg-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');b.dataset.val=v;}
+function getSegVal(c){const a=document.querySelector('#'+c+' .seg-btn.active');return a?(a.dataset.val||''):'';}
+function timeAgo(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
+function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── FAB ───────────────────────────────────────────────
+function openAdd(){if(currentTab==='features'||currentTab==='dash'){document.getElementById('fabMenu').classList.add('open');}else if(currentTab==='feedback')openForm('feedback');else openForm('note');}
+function closeFabMenu(){document.getElementById('fabMenu').classList.remove('open');}
+document.getElementById('fabMenu').addEventListener('click',e=>{if(e.target===document.getElementById('fabMenu'))closeFabMenu();});
 
 // ── Sheet ─────────────────────────────────────────────
-function openAdd() { const fm={dash:'feature',features:'feature',feedback:'feedback',notes:'note'}; showForm(fm[currentTab]||'feature'); document.getElementById('addSheet').classList.add('open'); resetForms(); }
-function showForm(f) { ['feature','feedback','note'].forEach(x=>document.getElementById('form-'+x).style.display=x===f?'block':'none'); document.getElementById('sheetTitle').textContent={feature:'Add Feature',feedback:'Log Feedback',note:'Add Note'}[f]; }
-function closeSheet() { document.getElementById('addSheet').classList.remove('open'); }
-document.getElementById('addSheet').addEventListener('click', e=>{ if(e.target===document.getElementById('addSheet'))closeSheet(); });
-function resetForms() { ['f-name','f-desc','fb-title','fb-details','fb-source','n-text','n-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';}); document.querySelectorAll('#f-status-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===0)); document.querySelectorAll('#f-priority-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===1)); document.querySelectorAll('#fb-type-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===0)); }
+function openForm(f,editId=null){
+  editingFeatureId=editId;
+  ['feature','feedback','note','folder'].forEach(x=>document.getElementById('form-'+x).style.display=x===f?'block':'none');
+  const titles={feature:'Add Feature',feedback:'Log Feedback',note:'Add Note',folder:'New Folder'};
+  document.getElementById('sheetTitle').textContent=titles[f]||'';
+  document.getElementById('addSheet').classList.add('open');
+  if(f==='feature') setupFeatureForm(editId);
+  else if(f==='folder') setupFolderForm();
+  else resetForms();
+}
+function closeSheet(){document.getElementById('addSheet').classList.remove('open');editingFeatureId=null;selectedFolderName=null;}
+document.getElementById('addSheet').addEventListener('click',e=>{if(e.target===document.getElementById('addSheet'))closeSheet();});
 
-// ── Save ──────────────────────────────────────────────
-function saveFeature() { const n=document.getElementById('f-name').value.trim(); if(!n){document.getElementById('f-name').focus();return;} features.unshift({id:Date.now(),name:n,desc:document.getElementById('f-desc').value.trim(),status:getSegVal('f-status-ctrl')||'todo',priority:getSegVal('f-priority-ctrl')||'mid',ts:Date.now(),done:false}); closeSheet();renderAll();scheduleSave();showToast('✅ Feature saved!'); }
-function saveFeedback() { const t=document.getElementById('fb-title').value.trim(); if(!t){document.getElementById('fb-title').focus();return;} feedbacks.unshift({id:Date.now(),type:getSegVal('fb-type-ctrl')||'bug',title:t,details:document.getElementById('fb-details').value.trim(),source:document.getElementById('fb-source').value.trim(),ts:Date.now(),resolved:false}); closeSheet();renderAll();scheduleSave();showToast('✅ Feedback saved!'); }
-function saveNote() { const t=document.getElementById('n-text').value.trim(); if(!t){document.getElementById('n-text').focus();return;} notes.unshift({id:Date.now(),text:t,tag:document.getElementById('n-tag').value.trim(),ts:Date.now(),done:false}); closeSheet();renderAll();scheduleSave();showToast('✅ Note saved!'); }
+// ── Folder Picker ──────────────────────────────────────
+function openFolderDropdown(){
+  filterFolderOptions();
+  document.getElementById('folderDropdown').classList.add('open');
+}
+function filterFolderOptions(){
+  const q=document.getElementById('folderSearchInput').value.toLowerCase();
+  const dd=document.getElementById('folderDropdown');
+  const filtered=folders.filter(f=>f.name.toLowerCase().includes(q));
+  if(!filtered.length){dd.innerHTML=`<div style="padding:14px;text-align:center;font-size:13px;color:var(--muted)">No folders found</div>`;dd.classList.add('open');return;}
+  dd.innerHTML=filtered.map(f=>{
+    const cnt=features.filter(x=>x.folder===f.name).length;
+    return`<div class="folder-option${selectedFolderName===f.name?' selected':''}" onclick="selectFolder('${esc(f.name)}','${esc(f.icon||'📁')}')">
+      <span class="folder-option-icon">${f.icon||'📁'}</span>
+      <span class="folder-option-name">${esc(f.name)}</span>
+      <span class="folder-option-count">${cnt} feat</span>
+    </div>`;
+  }).join('');
+  dd.classList.add('open');
+}
+function selectFolder(name,icon){
+  selectedFolderName=name;
+  document.getElementById('folderSearchInput').value='';
+  document.getElementById('folderDropdown').classList.remove('open');
+  const disp=document.getElementById('folderSelectedDisplay');
+  document.getElementById('folderSelectedIcon').textContent=icon;
+  document.getElementById('folderSelectedText').textContent=name;
+  disp.classList.add('show');
+}
+function clearFolderSelection(){
+  selectedFolderName=null;
+  document.getElementById('folderSelectedDisplay').classList.remove('show');
+  document.getElementById('folderSearchInput').value='';
+}
+// Close dropdown when clicking outside
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.folder-picker')&&!e.target.closest('#folderDropdown')){
+    document.getElementById('folderDropdown')?.classList.remove('open');
+  }
+});
 
-// ── Actions ───────────────────────────────────────────
-function delFeature(id) { features=features.filter(x=>x.id!==id); renderAll();scheduleSave();showToast('🗑 Deleted'); }
-function delFeedback(id) { feedbacks=feedbacks.filter(x=>x.id!==id); renderAll();scheduleSave();showToast('🗑 Deleted'); }
-function delNote(id) { notes=notes.filter(x=>x.id!==id); renderAll();scheduleSave();showToast('🗑 Deleted'); }
-function toggleFeatureDone(id) { const f=features.find(x=>x.id===id); if(!f)return; f.done=!f.done; f.status=f.done?'done':'todo'; renderAll();scheduleSave(); }
-function toggleNoteDone(id) { const n=notes.find(x=>x.id===id); if(!n)return; n.done=!n.done; renderAll();scheduleSave(); }
-function toggleFbResolved(id) { const f=feedbacks.find(x=>x.id===id); if(!f)return; f.resolved=!f.resolved; renderAll();scheduleSave(); }
-function cycleStatus(id) { const f=features.find(x=>x.id===id); if(!f)return; const o=['todo','doing','done','blocked']; f.status=o[(o.indexOf(f.status)+1)%o.length]; f.done=f.status==='done'; renderAll();scheduleSave(); }
-
-// ── Render ────────────────────────────────────────────
-function badgeHtml(s) { const l={todo:'Todo',doing:'In Progress',done:'Done',blocked:'Blocked'}; return`<span class="badge badge-${s}">${l[s]||s}</span>`; }
-function typeEmoji(t) { return{bug:'🐛',idea:'💡',ux:'✨',other:'📋'}[t]||'📋'; }
-function typeColor(t) { return{bug:'var(--pink)',idea:'var(--yellow)',ux:'var(--blue)',other:'var(--muted2)'}[t]||'var(--muted2)'; }
-function esc(s) { if(!s)return''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function renderFeatures(q) {
-  const list=document.getElementById('features-list');
-  let items=[...features];
-  if(q){const lq=q.toLowerCase();items=items.filter(f=>(f.name+f.desc).toLowerCase().includes(lq));}
-  document.getElementById('feat-count').textContent=items.length;
-  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-icon">⚡</div><div class="empty-text">No features yet.<br>Tap + to add your first one.</div></div>`;return;}
-  list.innerHTML=items.map(f=>`<div class="card"><div class="card-accent" style="background:${f.priority==='high'?'var(--pink)':f.priority==='mid'?'var(--yellow)':'var(--muted)'}"></div><div style="padding-left:10px"><div style="display:flex;align-items:flex-start;gap:8px"><button class="done-check ${f.done?'checked':''}" onclick="toggleFeatureDone(${f.id})"></button><div style="flex:1"><div class="card-title ${f.done?'crossed':''}">${esc(f.name)}</div>${f.desc?`<div class="card-meta">${esc(f.desc)}</div>`:''}</div></div><div class="card-footer"><div style="display:flex;align-items:center;gap:8px"><button onclick="cycleStatus(${f.id})" style="background:none;border:none;padding:0;cursor:pointer;">${badgeHtml(f.status)}</button><span style="font-size:11px;color:var(--muted)">${timeAgo(f.ts)}</span></div><button class="icon-btn del" onclick="delFeature(${f.id})">✕</button></div></div></div>`).join('');
+// ── Folder form setup ─────────────────────────────────
+selectedFolderIcon='📁'; selectedFolderColor='var(--orange)';
+function setupFolderForm(){
+  document.getElementById('fold-name').value='';
+  document.getElementById('fold-icon').value='';
+  selectedFolderIcon='📁'; selectedFolderColor='var(--orange)';
+  // reset emoji selection
+  document.querySelectorAll('#emojiPicker span').forEach(s=>s.style.background='');
+  // reset color selection
+  document.querySelectorAll('.color-swatch').forEach((s,i)=>s.style.borderColor=i===0?'#1a1a2e':'transparent');
+}
+function selectEmoji(el){
+  document.querySelectorAll('#emojiPicker span').forEach(s=>s.style.background='');
+  el.style.background='var(--card2)';
+  selectedFolderIcon=el.textContent;
+  document.getElementById('fold-icon').value=el.textContent;
+}
+function selectColor(el,color){
+  document.querySelectorAll('.color-swatch').forEach(s=>s.style.borderColor='transparent');
+  el.style.borderColor='#1a1a2e';
+  selectedFolderColor=color;
 }
 
-function renderFeedback() {
+// ── Feature form setup ────────────────────────────────
+function setupFeatureForm(editId){
+  // Role chips
+  const chipsEl=document.getElementById('f-role-chips');
+  const allRoles=[...new Set([...DEFAULT_ROLES,...features.flatMap(f=>f.roles||[])])];
+  chipsEl.innerHTML=allRoles.map(r=>`<div class="role-chip" onclick="this.classList.toggle('active')">${esc(r)}</div>`).join('');
+  // Clear folder picker
+  clearFolderSelection();
+
+  if(editId){
+    const feat=features.find(x=>x.id===editId);if(!feat)return;
+    document.getElementById('sheetTitle').textContent='✏️ Edit Feature';
+    document.getElementById('featureSaveBtn').textContent='Update Feature';
+    document.getElementById('f-name').value=feat.name||'';
+    document.getElementById('f-desc').value=feat.desc||'';
+    document.getElementById('f-custom-role').value='';
+    // set folder
+    if(feat.folder&&feat.folder!=='Uncategorized'){
+      const fld=folders.find(x=>x.name===feat.folder);
+      selectFolder(feat.folder,fld?.icon||'📁');
+    }
+    // set status
+    document.querySelectorAll('#f-status-ctrl .seg-btn').forEach(b=>{const v=b.dataset.val||(b.textContent.trim().toLowerCase().replace(/\s+/g,''));b.classList.toggle('active',v===feat.status||(feat.status==='todo'&&v==='todo'));});
+    document.querySelectorAll('#f-status-ctrl .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.val===feat.status));
+    // set priority
+    document.querySelectorAll('#f-priority-ctrl .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.val===feat.priority));
+    // set roles
+    const roles=feat.roles||[];
+    chipsEl.querySelectorAll('.role-chip').forEach(c=>{if(roles.includes(c.textContent))c.classList.add('active');});
+  } else {
+    document.getElementById('sheetTitle').textContent='Add Feature';
+    document.getElementById('featureSaveBtn').textContent='Save Feature';
+    document.getElementById('f-name').value='';
+    document.getElementById('f-desc').value='';
+    document.getElementById('f-custom-role').value='';
+    document.querySelectorAll('#f-status-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+    document.querySelectorAll('#f-priority-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===1));
+  }
+}
+
+function resetForms(){['fb-title','fb-details','fb-source','n-text','n-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.querySelectorAll('#fb-type-ctrl .seg-btn').forEach((b,i)=>b.classList.toggle('active',i===0));}
+
+function getSelectedRoles(){
+  const fromChips=[...document.querySelectorAll('.role-chip.active')].map(c=>c.textContent);
+  const custom=document.getElementById('f-custom-role').value.trim();
+  if(custom&&!fromChips.includes(custom))fromChips.push(custom);
+  return fromChips;
+}
+
+// ── Save ──────────────────────────────────────────────
+function saveFeature(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){document.getElementById('f-name').focus();return;}
+  const data={name,desc:document.getElementById('f-desc').value.trim(),folder:selectedFolderName||'Uncategorized',roles:getSelectedRoles(),status:getSegVal('f-status-ctrl')||'todo',priority:getSegVal('f-priority-ctrl')||'mid'};
+  if(editingFeatureId){
+    const idx=features.findIndex(x=>x.id===editingFeatureId);
+    if(idx>=0)features[idx]={...features[idx],...data,done:data.status==='done'};
+    showToast('✅ Feature updated!');
+  } else {
+    features.unshift({id:Date.now(),...data,ts:Date.now(),done:false});
+    showToast('✅ Feature saved!');
+  }
+  closeSheet();renderAll();scheduleSave();
+}
+
+function saveFolder(){
+  const name=document.getElementById('fold-name').value.trim();
+  if(!name){document.getElementById('fold-name').focus();return;}
+  const iconInput=document.getElementById('fold-icon').value.trim();
+  const icon=iconInput||selectedFolderIcon||'📁';
+  const color=selectedFolderColor||'var(--orange)';
+  folders.push({id:Date.now(),name,icon,color,open:true});
+  closeSheet();renderAll();scheduleSave();showToast('📁 Folder created!');
+}
+
+function saveFeedback(){const t=document.getElementById('fb-title').value.trim();if(!t){document.getElementById('fb-title').focus();return;}feedbacks.unshift({id:Date.now(),type:getSegVal('fb-type-ctrl')||'bug',title:t,details:document.getElementById('fb-details').value.trim(),source:document.getElementById('fb-source').value.trim(),ts:Date.now(),resolved:false});closeSheet();renderAll();scheduleSave();showToast('✅ Feedback saved!');}
+function saveNote(){const t=document.getElementById('n-text').value.trim();if(!t){document.getElementById('n-text').focus();return;}notes.unshift({id:Date.now(),text:t,tag:document.getElementById('n-tag').value.trim(),ts:Date.now(),done:false});closeSheet();renderAll();scheduleSave();showToast('✅ Note saved!');}
+
+// ── Actions ───────────────────────────────────────────
+function delFeature(id){features=features.filter(x=>x.id!==id);renderAll();scheduleSave();showToast('🗑 Deleted');}
+function delFeedback(id){feedbacks=feedbacks.filter(x=>x.id!==id);renderAll();scheduleSave();showToast('🗑 Deleted');}
+function delNote(id){notes=notes.filter(x=>x.id!==id);renderAll();scheduleSave();showToast('🗑 Deleted');}
+function delFolder(id){const f=folders.find(x=>x.id===id);if(f)features.forEach(feat=>{if(feat.folder===f.name)feat.folder='Uncategorized';});folders=folders.filter(x=>x.id!==id);renderAll();scheduleSave();showToast('🗑 Folder deleted');}
+function editFeature(id){openForm('feature',id);}
+function toggleFeatureDone(id){const f=features.find(x=>x.id===id);if(!f)return;f.done=!f.done;f.status=f.done?'done':'todo';renderAll();scheduleSave();}
+function toggleNoteDone(id){const n=notes.find(x=>x.id===id);if(!n)return;n.done=!n.done;renderAll();scheduleSave();}
+function toggleFbResolved(id){const f=feedbacks.find(x=>x.id===id);if(!f)return;f.resolved=!f.resolved;renderAll();scheduleSave();}
+function cycleStatus(id){const f=features.find(x=>x.id===id);if(!f)return;const o=['todo','doing','done','blocked'];f.status=o[(o.indexOf(f.status)+1)%o.length];f.done=f.status==='done';renderAll();scheduleSave();}
+function toggleFolder(id){const f=folders.find(x=>x.id===id);if(f){f.open=!f.open;renderFeatures();}}
+
+// ── Role filter ───────────────────────────────────────
+function setRoleFilter(role){activeRoleFilter=role;document.querySelectorAll('.filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.role===role));renderFeatures();}
+
+// ── Render helpers ────────────────────────────────────
+function badgeHtml(s){const l={todo:'Todo',doing:'In Progress',done:'Done',blocked:'Blocked'};return`<span class="badge badge-${s}">${l[s]||s}</span>`;}
+function typeEmoji(t){return{bug:'🐛',idea:'💡',ux:'✨',other:'📋'}[t]||'📋';}
+function typeColor(t){return{bug:'var(--pink)',idea:'var(--yellow)',ux:'var(--blue)',other:'var(--muted2)'}[t]||'var(--muted2)';}
+function rolePillHtml(roles){
+  if(!roles||!roles.length)return'';
+  const cols=['var(--purple)','var(--blue)','var(--green)','var(--orange)','var(--pink)'];
+  return`<div style="margin-top:5px">${roles.map((r,i)=>`<span class="role-pill" style="background:${cols[i%cols.length]}15;color:${cols[i%cols.length]};border:1px solid ${cols[i%cols.length]}30">${esc(r)}</span>`).join('')}</div>`;
+}
+
+function featureCardHtml(f){
+  return`<div class="feat-card">
+    <div class="feat-card-accent" style="background:${f.priority==='high'?'var(--pink)':f.priority==='mid'?'var(--yellow)':'var(--muted)'}"></div>
+    <div style="padding-left:10px">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <button class="done-check ${f.done?'checked':''}" onclick="toggleFeatureDone(${f.id})"></button>
+        <div style="flex:1">
+          <div class="feat-card-title ${f.done?'crossed':''}">${esc(f.name)}</div>
+          ${f.desc?`<div class="feat-card-desc">${esc(f.desc)}</div>`:''}
+          ${rolePillHtml(f.roles)}
+        </div>
+      </div>
+      <div class="feat-card-footer">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <button onclick="cycleStatus(${f.id})" style="background:none;border:none;padding:0;cursor:pointer;">${badgeHtml(f.status)}</button>
+          <span style="font-size:11px;color:var(--muted)">${timeAgo(f.ts)}</span>
+        </div>
+        <div class="feat-card-actions">
+          <button class="icon-btn edit" onclick="editFeature(${f.id})">✏️</button>
+          <button class="icon-btn del" onclick="delFeature(${f.id})">✕</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Render Features ───────────────────────────────────
+function renderFeatures(){
+  const list=document.getElementById('features-list');
+  const q=(document.getElementById('featSearch')?.value||'').toLowerCase();
+
+  // Role filter bar
+  const allRoles=[...new Set(features.flatMap(f=>f.roles||[]))];
+  document.getElementById('roleFilterBar').innerHTML=['All',...allRoles].map(r=>`<div class="filter-chip${activeRoleFilter===r?' active':''}" data-role="${esc(r)}" onclick="setRoleFilter('${esc(r)}')">${esc(r)}</div>`).join('');
+
+  let items=features.filter(f=>{
+    const mq=!q||(f.name+f.desc).toLowerCase().includes(q);
+    const mr=activeRoleFilter==='All'||(f.roles||[]).includes(activeRoleFilter);
+    return mq&&mr;
+  });
+  document.getElementById('feat-count').textContent=items.length;
+
+  if(!items.length&&!folders.length){list.innerHTML=`<div class="empty"><div class="empty-icon">⚡</div><div class="empty-text">No features yet.<br>Tap + to add your first one.</div></div>`;return;}
+
+  let html='';
+
+  // Render folders
+  folders.forEach(folder=>{
+    const fItems=items.filter(f=>f.folder===folder.name);
+    const allFolderItems=features.filter(f=>f.folder===folder.name);
+    const doneCount=allFolderItems.filter(f=>f.done).length;
+    const pct=allFolderItems.length?Math.round(doneCount/allFolderItems.length*100):0;
+    const isOpen=folder.open!==false;
+    const col=folder.color||'var(--orange)';
+    const bgCol=col.replace('var(--','').replace(')','');
+
+    html+=`<div class="folder-section">
+      <div class="folder-card" style="position:relative">
+        <div class="folder-color-stripe" style="background:${col}"></div>
+        <div class="folder-top" onclick="toggleFolder(${folder.id})" style="padding-top:16px">
+          <div style="display:flex;align-items:center;gap:0">
+            <div class="folder-emoji-wrap" style="background:${col}18">
+              <span style="font-size:20px">${folder.icon||'📁'}</span>
+            </div>
+            <div class="folder-info">
+              <div class="folder-title">${esc(folder.name)}</div>
+              <div class="folder-subtitle">${allFolderItems.length} feature${allFolderItems.length!==1?'s':''} · ${pct}% done</div>
+            </div>
+          </div>
+          <div class="folder-right-wrap">
+            <div class="folder-count-badge" style="background:${col}15;border-color:${col}30;color:${col}">${fItems.length}</div>
+            <button class="folder-del-btn" onclick="event.stopPropagation();delFolder(${folder.id})">✕</button>
+            <div class="folder-chevron${isOpen?' open':''}">›</div>
+          </div>
+        </div>
+        ${allFolderItems.length?`<div class="folder-progress-bar"><div class="folder-progress-fill" style="width:${pct}%;background:${col}"></div></div>`:''}
+        <div class="folder-divider"></div>
+        <div class="folder-content${isOpen?' open':''}">
+          ${fItems.length?fItems.map(featureCardHtml).join(''):`<div class="folder-empty-msg">No features here yet${q||activeRoleFilter!=='All'?' matching your filter':''}</div>`}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  // Uncategorized
+  const uncategorized=items.filter(f=>!f.folder||f.folder==='Uncategorized');
+  if(uncategorized.length){
+    if(folders.length)html+=`<div class="section-label" style="margin-top:4px;margin-bottom:8px">📂 Uncategorized</div>`;
+    html+=uncategorized.map(featureCardHtml).join('');
+  }
+
+  if(!html)html=`<div class="empty"><div class="empty-icon">⚡</div><div class="empty-text">No features match your filter.</div></div>`;
+  list.innerHTML=html;
+}
+
+// ── Render Feedback ───────────────────────────────────
+function renderFeedback(){
   const list=document.getElementById('feedback-list');
   document.getElementById('fb-count').textContent=feedbacks.length;
   if(!feedbacks.length){list.innerHTML=`<div class="empty"><div class="empty-icon">💬</div><div class="empty-text">No feedback yet.<br>Tap + to log some.</div></div>`;return;}
-  list.innerHTML=feedbacks.map(f=>`<div class="card"><div class="card-accent" style="background:${typeColor(f.type)}"></div><div style="padding-left:10px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:16px">${typeEmoji(f.type)}</span><span class="fb-type" style="color:${typeColor(f.type)}">${f.type}</span>${f.resolved?'<span class="badge badge-done" style="font-size:10px">Resolved</span>':''}</div><div class="card-title ${f.resolved?'crossed':''}">${esc(f.title)}</div>${f.details?`<div class="card-body">${esc(f.details)}</div>`:''}${f.source?`<div class="card-meta" style="margin-top:6px">📍 ${esc(f.source)}</div>`:''}<div class="card-footer"><span style="font-size:11px;color:var(--muted)">${timeAgo(f.ts)}</span><div class="card-actions"><button class="icon-btn" onclick="toggleFbResolved(${f.id})">${f.resolved?'↺':'✓'}</button><button class="icon-btn del" onclick="delFeedback(${f.id})">✕</button></div></div></div></div>`).join('');
+  list.innerHTML=feedbacks.map(f=>`<div class="card"><div class="card-accent" style="background:${typeColor(f.type)}"></div><div style="padding-left:10px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:16px">${typeEmoji(f.type)}</span><span class="fb-type-label" style="color:${typeColor(f.type)}">${f.type}</span>${f.resolved?'<span class="badge badge-done" style="font-size:10px">Resolved</span>':''}</div><div class="card-title ${f.resolved?'crossed':''}">${esc(f.title)}</div>${f.details?`<div class="card-body">${esc(f.details)}</div>`:''}${f.source?`<div class="card-meta" style="margin-top:6px">📍 ${esc(f.source)}</div>`:''}<div class="card-footer"><span style="font-size:11px;color:var(--muted)">${timeAgo(f.ts)}</span><div class="card-actions"><button class="icon-btn" onclick="toggleFbResolved(${f.id})">${f.resolved?'↺':'✓'}</button><button class="icon-btn del" onclick="delFeedback(${f.id})">✕</button></div></div></div></div>`).join('');
 }
 
-function renderNotes() {
+// ── Render Notes ──────────────────────────────────────
+function renderNotes(){
   const list=document.getElementById('notes-list');
   document.getElementById('notes-count').textContent=notes.length;
   if(!notes.length){list.innerHTML=`<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">No notes yet.<br>Tap + to jot something down.</div></div>`;return;}
-  list.innerHTML=notes.map(n=>`<div class="card"><div class="card-accent" style="background:${n.done?'var(--muted)':'linear-gradient(180deg,var(--orange),var(--yellow))'}"></div><div style="padding-left:10px"><div style="display:flex;align-items:flex-start;gap:10px"><button class="done-check ${n.done?'checked':''}" onclick="toggleNoteDone(${n.id})"></button><div style="flex:1"><div class="note-content ${n.done?'crossed':''}">${esc(n.text)}</div><div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between"><div>${n.tag?`<span class="note-tag">${esc(n.tag)}</span>`:''}<span style="font-size:11px;color:var(--muted)">${timeAgo(n.ts)}</span></div><button class="icon-btn del" onclick="delNote(${n.id})">✕</button></div></div></div></div></div>`).join('');
+  list.innerHTML=notes.map(n=>`<div class="card"><div class="card-accent" style="background:${n.done?'var(--muted)':'linear-gradient(180deg,var(--orange),var(--yellow))'}"></div><div style="padding-left:10px"><div style="display:flex;align-items:flex-start;gap:10px"><button class="done-check ${n.done?'checked':''}" onclick="toggleNoteDone(${n.id})"></button><div style="flex:1"><div class="note-content ${n.done?'crossed':''}">${esc(n.text)}</div><div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between"><div>${n.tag?`<span class="note-tag-pill">${esc(n.tag)}</span>`:''}<span style="font-size:11px;color:var(--muted)">${timeAgo(n.ts)}</span></div><button class="icon-btn del" onclick="delNote(${n.id})">✕</button></div></div></div></div></div>`).join('');
 }
 
-function renderDash() {
-  const done=features.filter(f=>f.status==='done').length, doing=features.filter(f=>f.status==='doing').length;
+// ── Render Dashboard ──────────────────────────────────
+function renderDash(){
+  const done=features.filter(f=>f.status==='done').length,doing=features.filter(f=>f.status==='doing').length;
   const pct=features.length?Math.round(done/features.length*100):0;
   document.getElementById('d-features').textContent=features.length;
   document.getElementById('d-doing').textContent=doing;
@@ -385,13 +822,13 @@ function renderDash() {
   const all=[...features.map(x=>({...x,kind:'feature',icon:'⚡'})),...feedbacks.map(x=>({...x,kind:'feedback',icon:typeEmoji(x.type)})),...notes.map(x=>({...x,kind:'note',icon:'📝'}))].sort((a,b)=>b.ts-a.ts).slice(0,5);
   const el=document.getElementById('d-recent');
   if(!all.length){el.innerHTML=`<div class="empty"><div class="empty-icon">🚀</div><div class="empty-text">Start adding features, feedback<br>and notes to track progress.</div></div>`;return;}
-  el.innerHTML=all.map(item=>`<div class="card" style="padding:12px 14px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">${item.icon}</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">${esc(item.name||item.title||item.text)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${item.kind} · ${timeAgo(item.ts)}</div></div>${item.kind==='feature'?badgeHtml(item.status):''}</div></div>`).join('');
+  el.innerHTML=all.map(item=>`<div class="card" style="padding:12px 14px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">${item.icon}</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">${esc(item.name||item.title||item.text)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${item.kind}${item.folder&&item.folder!=='Uncategorized'?' · 📁 '+esc(item.folder):''} · ${timeAgo(item.ts)}</div></div>${item.kind==='feature'?badgeHtml(item.status):''}</div></div>`).join('');
 }
 
-function renderAll() { renderDash();renderFeatures();renderFeedback();renderNotes(); }
+function renderAll(){renderDash();renderFeatures();renderFeedback();renderNotes();}
 
 // ── Init ──────────────────────────────────────────────
-document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+document.getElementById('headerDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
 loadData();
 </script>
 </body>
